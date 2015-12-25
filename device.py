@@ -27,6 +27,16 @@ class Device(object):
         y = 'Y%s' % y
         self.write('G1', x, y)
 
+    def draw(self, points, up, down):
+        if not points:
+            return
+        self.pen(up)
+        self.move(*points[0])
+        self.pen(down)
+        for point in points:
+            self.move(*point)
+        self.pen(up)
+
     def pen(self, position):
         self.write('M1', position)
 
