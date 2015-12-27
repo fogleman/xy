@@ -33,7 +33,6 @@ def polygon(sides, d):
     y = 0.5
     rotation = 0
     angle = 2 * pi / sides
-    rotation = rotation - pi / 4
     angles = [angle * i + rotation for i in range(sides)]
     return [(x + cos(a) * d, y + sin(a) * d) for a in angles]
 
@@ -65,9 +64,12 @@ def main():
         x = random.random()
         y = random.random()
         path = create_path(model, 315, 0, 0, x, y, 1, 100)
+        before = len(path)
         path = util.simplify(path)
+        after = len(path)
         total += 1
-        print total, path[0]
+        print '%5d: %d -> %2d points @ (%.3f, %.3f)' % (
+            total, before, after, path[0][0], path[0][1])
         device.draw(path, PEN_UP, PEN_DOWN)
 
 if __name__ == '__main__':
