@@ -2,8 +2,9 @@ import serial
 
 class Device(object):
 
-    def __init__(self, port):
+    def __init__(self, port, verbose=False):
         self.serial = serial.Serial(port, 115200)
+        self.verbose = verbose
 
     def read(self):
         data = []
@@ -15,9 +16,12 @@ class Device(object):
 
     def write(self, *args):
         line = ' '.join(map(str, args))
-        print line
+        if self.verbose:
+            print line
         self.serial.write('%s\n' % line)
-        print self.read()
+        response = self.read()
+        if self.verbose:
+            print response
 
     def home(self):
         self.write('G28')
