@@ -5,8 +5,8 @@ import random
 import time
 import util
 
-PEN_UP = 10
-PEN_DOWN = 30
+PEN_UP = 20
+PEN_DOWN = 50
 
 class Model(object):
     def __init__(self):
@@ -51,28 +51,24 @@ def create_path(model, scale, ox, oy, x, y, m, length):
     return result
 
 def main():
-    device = Device('/dev/tty.wchusbserial1420')
+    device = Device('/dev/tty.wchusbserial640')
     time.sleep(2)
     device.pen(PEN_UP)
     time.sleep(1)
     device.home()
     model = Model()
-    for x, y in polygon(4, 0.35355339):
+    for x, y in polygon(5, 0.35):
         model.add(x, y, 1)
-    model.add(0.5, 0.5, -1)
-    count = 0
+    model.add(0.5, 0.5, 0.1)
+    total = 0
     while True:
-        points = poisson_disc(0, 0, 1, 1, 0.05, 32)
-        points = util.sort_points(points)
-        print len(points), 'poisson disc points'
-        for x, y in points:
-            # m = random.choice([-1, 1])
-            m = 1
-            path = create_path(model, 250, 14.7, 52.8, x, y, m, 10)
-            path = util.simplify(path)
-            count += 1
-            print count
-            device.draw(path, PEN_UP, PEN_DOWN)
+        x = random.random()
+        y = random.random()
+        path = create_path(model, 315, 0, 0, x, y, 1, 100)
+        path = util.simplify(path)
+        total += 1
+        print total, path[0]
+        device.draw(path, PEN_UP, PEN_DOWN)
 
 if __name__ == '__main__':
     main()

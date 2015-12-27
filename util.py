@@ -13,7 +13,7 @@ def sort_points(points):
         result.append(p)
     return result
 
-def simplify(points, tolerance=0.1):
+def simplify(points, tolerance=0.05):
     if len(points) < 2:
         return points
     line = LineString(points)
