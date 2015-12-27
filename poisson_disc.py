@@ -29,8 +29,8 @@ class Grid(object):
         return True
 
 def poisson_disc(x1, y1, x2, y2, r, n):
-    x = x1 + (x2 - x1) / 2.0
-    y = y1 + (y2 - y1) / 2.0
+    x = x1 + random.random() * (x2 - x1)
+    y = y1 + random.random() * (y2 - y1)
     active = [(x, y)]
     grid = Grid(r)
     grid.insert(x, y)
