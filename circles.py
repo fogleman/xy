@@ -3,6 +3,7 @@ from math import sin, cos, pi, hypot
 from poisson_disc import poisson_disc
 import random
 import time
+import util
 
 PEN_UP = 0
 PEN_DOWN = 40
@@ -17,18 +18,6 @@ def circle(cx, cy, r, n):
         result.append((x, y))
     return result
 
-def sort_points(points):
-    result = []
-    p = max(points)
-    points.remove(p)
-    result.append(p)
-    while points:
-        px, py = result[-1]
-        p = min(points, key=lambda (x, y): hypot(x - px, y - py))
-        points.remove(p)
-        result.append(p)
-    return result
-
 def main():
     mm = 25.4
     w = 11 * mm
@@ -36,7 +25,7 @@ def main():
     p = 0.5 * mm
     s = 0.25 * mm
     points = poisson_disc(p, p, w - p * 2, h - p * 2, s, 32)
-    points = sort_points(points)
+    points = util.sort_points(points)
     print len(points)
     device = Device('/dev/tty.wchusbserial1420')
     time.sleep(3)

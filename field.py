@@ -55,6 +55,7 @@ def main():
     device.pen(PEN_UP)
     time.sleep(1)
     device.home()
+    time.sleep(5)
     model = Model()
     for x, y in polygon(5, 0.35):
         model.add(x, y, 1)
