@@ -1,6 +1,7 @@
 from device import Device
 from math import hypot, atan2, sin, cos, pi
 from poisson_disc import poisson_disc
+import planner
 import random
 import time
 import util
@@ -62,16 +63,19 @@ def main():
     model.add(0.5, 0.5, 0.1)
     total = 0
     while True:
-        x = random.random()
-        y = random.random()
-        path = create_path(model, 315, 0, 0, x, y, 1, 100)
-        before = len(path)
-        path = util.simplify(path)
-        after = len(path)
-        total += 1
-        print '%5d: %d -> %2d points @ (%.3f, %.3f)' % (
-            total, before, after, path[0][0], path[0][1])
-        device.draw(path, PEN_UP, PEN_DOWN)
+        paths = []
+        for _ in range(100):
+            x = random.random()
+            y = random.random()
+            path = create_path(model, 315, 0, 0, x, y, 1, 100)
+            path = util.simplify(path)
+            paths.append(path)
+        paths = planner.order_paths(paths)
+        for path in paths:
+            total += 1
+            print '%5d: %2d points @ (%.3f, %.3f)' % (
+                total, len(path), path[0][0], path[0][1])
+            device.draw(path, PEN_UP, PEN_DOWN)
 
 if __name__ == '__main__':
     main()
