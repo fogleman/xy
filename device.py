@@ -1,4 +1,5 @@
 import serial
+import time
 
 class Device(object):
 
@@ -37,6 +38,7 @@ class Device(object):
         self.pen(up)
         self.move(*points[0])
         self.pen(down)
+        time.sleep(0.15)
         for point in points:
             self.move(*point)
         self.pen(up)

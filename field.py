@@ -7,7 +7,7 @@ import time
 import util
 
 PEN_UP = 20
-PEN_DOWN = 50
+PEN_DOWN = 60
 
 class Model(object):
     def __init__(self):
@@ -56,7 +56,6 @@ def main():
     device.pen(PEN_UP)
     time.sleep(1)
     device.home()
-    time.sleep(5)
     model = Model()
     for x, y in polygon(5, 0.35):
         model.add(x, y, 1)
@@ -64,13 +63,16 @@ def main():
     total = 0
     while True:
         paths = []
+        print 'generating paths'
         for _ in range(100):
             x = random.random()
             y = random.random()
             path = create_path(model, 315, 0, 0, x, y, 1, 100)
             path = util.simplify(path)
             paths.append(path)
+        print 'optimizing path ordering'
         paths = planner.order_paths(paths)
+        print 'drawing paths'
         for path in paths:
             total += 1
             print '%5d: %2d points @ (%.3f, %.3f)' % (
