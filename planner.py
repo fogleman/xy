@@ -14,7 +14,7 @@ def order_paths(paths, iterations=100000, verbose=False):
     want to find something good enough.
 
     With randomly generated paths, the algorithm can quickly find a solution
-    that reduces the extra distance to 25 percent of its original value.
+    that reduces the extra distance to ~25 percent of its original value.
     '''
     state = Model(paths)
     before = state.energy()
@@ -28,17 +28,14 @@ def order_paths(paths, iterations=100000, verbose=False):
         print 'improved distance : %g (%.1f%% of original)' % (after, pct)
     return state.paths
 
-# the algorithm cannot work with floating point distances due to optimizations
-# this factor is used to scale up floats to workable integers
-FACTOR = 1000000
-
 class Model(object):
     def __init__(self, paths, distances=None, total_distance=None):
         self.paths = paths
-        self.total_distance = total_distance or 0
         if distances:
+            self.total_distance = total_distance or 0
             self.distances = distances
         else:
+            self.total_distance = 0
             self.distances = [0] * (len(paths) - 1)
             self.add_distances(range(len(self.distances)))
     def subtract_distances(self, indexes):
@@ -52,11 +49,11 @@ class Model(object):
             if i >= 0 and i < n:
                 x1, y1 = self.paths[i][-1]
                 x2, y2 = self.paths[i + 1][0]
-                self.distances[i] = int(hypot(x2 - x1, y2 - y1) * FACTOR)
+                self.distances[i] = hypot(x2 - x1, y2 - y1)
                 self.total_distance += self.distances[i]
     def energy(self):
         # return the total extra distance for this ordering
-        return float(self.total_distance) / FACTOR
+        return self.total_distance
     def do_move(self):
         # mutate the state by swapping two random paths
         n = len(self.paths) - 1
