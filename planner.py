@@ -2,7 +2,7 @@ from math import hypot
 import anneal
 import random
 
-def order_paths(paths, iterations=100000, verbose=False):
+def order_paths(paths, iterations=100000):
     '''
     This function re-orders a set of 2D paths (polylines) to minimize the
     distance required to visit each path. This is useful for 2D plotting to
@@ -17,15 +17,9 @@ def order_paths(paths, iterations=100000, verbose=False):
     that reduces the extra distance to ~25 percent of its original value.
     '''
     state = Model(paths)
-    before = state.energy()
     max_temp = anneal.get_max_temp(state, 10000)
     min_temp = max_temp / 1000.0
     state = anneal.anneal(state, max_temp, min_temp, iterations)
-    after = state.energy()
-    pct = 100.0 * after / before
-    if verbose:
-        print 'original distance : %g' % before
-        print 'improved distance : %g (%.1f%% of original)' % (after, pct)
     return state.paths
 
 class Model(object):
@@ -76,15 +70,25 @@ class Model(object):
         return Model(
             list(self.paths), list(self.distances), self.total_distance)
 
-if __name__ == '__main__':
-    # test the module
-    random.seed(123)
+def test(n_paths, n_iterations):
     paths = []
-    for _ in range(100):
+    for _ in range(n_paths):
         x1 = random.random()
         y1 = random.random()
         x2 = random.random()
         y2 = random.random()
         path = [(x1, y1), (x2, y2)]
         paths.append(path)
-    order_paths(paths, verbose=True)
+    before = Model(paths).energy()
+    paths = order_paths(paths, n_iterations)
+    after = Model(paths).energy()
+    pct = 100.0 * after / before
+    return pct
+
+if __name__ == '__main__':
+    # test the module
+    random.seed(123)
+    for n_paths in [10, 100, 1000, 10000]:
+        for n_iterations in [10, 100, 1000, 10000, 100000, 1000000]:
+            pct = test(n_paths, n_iterations)
+            print n_paths, n_iterations, pct
