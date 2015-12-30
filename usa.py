@@ -38,7 +38,7 @@ def main():
     # im = g.render(0, 0, w, h, 96 / mm)
     # im.write_to_png('usa.png')
     # g.save('usa.nc')
-    device = Device('/dev/tty.wchusbserial1420')
+    device = Device()
     device.home()
     device.gcode(g)
 

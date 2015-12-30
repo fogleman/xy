@@ -6,9 +6,6 @@ import random
 import time
 import util
 
-PEN_UP = 20
-PEN_DOWN = 60
-
 class Model(object):
     def __init__(self):
         self.particles = []
@@ -51,9 +48,9 @@ def create_path(model, scale, ox, oy, x, y, m, length):
     return result
 
 def main():
-    device = Device('/dev/tty.wchusbserial640')
+    device = Device()
     time.sleep(2)
-    device.pen(PEN_UP)
+    device.pen_up()
     time.sleep(1)
     device.home()
     model = Model()
@@ -77,7 +74,7 @@ def main():
             total += 1
             print '%5d: %2d points @ (%.3f, %.3f)' % (
                 total, len(path), path[0][0], path[0][1])
-            device.draw(path, PEN_UP, PEN_DOWN)
+            device.draw(path)
 
 if __name__ == '__main__':
     main()

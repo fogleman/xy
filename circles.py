@@ -5,9 +5,6 @@ import planner
 import random
 import time
 
-PEN_UP = 0
-PEN_DOWN = 40
-
 def circle(cx, cy, r, n):
     result = []
     for i in range(n + 1):
@@ -27,18 +24,13 @@ def main():
     points = poisson_disc(p, p, w - p * 2, h - p * 2, s, 32)
     points = planner.sort_points(points)
     print len(points)
-    device = Device('/dev/tty.wchusbserial1420')
+    device = Device()
     time.sleep(3)
-    device.pen(PEN_UP)
+    device.pen_up()
     device.home()
     for cx, cy in points:
         r = (0.03125 + random.random() * 0.0625) * mm
-        c = circle(cx, cy, r, 36)
-        device.move(*c[0])
-        device.pen(PEN_DOWN)
-        for x, y in c:
-            device.move(x, y)
-        device.pen(PEN_UP)
+        device.draw(circle(cx, cy, r, 36))
     device.home()
 
 if __name__ == '__main__':
