@@ -1,21 +1,25 @@
+import time
 import xy
 
-def turn(i):
-    left = (((i & -i) << 1) & i) != 0
-    return 'L' if left else 'R'
-
-def main():
-    iteration = 11
-    n = 2 ** iteration - 1
+def main(iteration):
     t = xy.Turtle()
-    for i in range(1, n + 1):
+    for i in range(1, 2 ** iteration):
         t.forward(8)
-        if turn(i) == 'L':
-            t.circle(-8, 90, 36)
+        if (((i & -i) << 1) & i) != 0:
+            t.circle(-8, 90)
         else:
-            t.circle(8, 90, 36)
+            t.circle(8, 90)
+
     im = t.render()
-    im.write_to_png('turtle.png')
+    im.write_to_png('dragon.png')
+
+    device = xy.Device()
+    time.sleep(3)
+    device.pen_up()
+    device.home()
+    # TODO: scale / translate paths to proper plotter range
+    for path in t.get_paths():
+        device.draw(path)
 
 if __name__ == '__main__':
-    main()
+    main(11)
