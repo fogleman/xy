@@ -70,8 +70,8 @@ def main():
             path = create_path(model, 315, 0, 0, x, y, 1, 100)
             path = util.simplify(path)
             paths.append(path)
-        print 'optimizing path ordering'
-        paths = planner.order_paths(paths)
+        print 'sorting paths'
+        paths = planner.sort_paths(paths)
         print 'drawing paths'
         for path in paths:
             total += 1
