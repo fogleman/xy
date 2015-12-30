@@ -1,10 +1,7 @@
-from device import Device
 from math import hypot, atan2, sin, cos, pi
-from poisson_disc import poisson_disc
-import planner
 import random
 import time
-import util
+import xy
 
 class Model(object):
     def __init__(self):
@@ -48,7 +45,7 @@ def create_path(model, scale, ox, oy, x, y, m, length):
     return result
 
 def main():
-    device = Device()
+    device = xy.Device()
     time.sleep(2)
     device.pen_up()
     time.sleep(1)
@@ -65,10 +62,10 @@ def main():
             x = random.random()
             y = random.random()
             path = create_path(model, 315, 0, 0, x, y, 1, 100)
-            path = util.simplify(path)
+            path = xy.simplify(path)
             paths.append(path)
         print 'sorting paths'
-        paths = planner.sort_paths(paths)
+        paths = xy.sort_paths(paths)
         print 'drawing paths'
         for path in paths:
             total += 1

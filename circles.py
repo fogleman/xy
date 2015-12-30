@@ -1,9 +1,8 @@
-from device import Device
 from math import sin, cos, pi, hypot
 from poisson_disc import poisson_disc
-import planner
 import random
 import time
+import xy
 
 def circle(cx, cy, r, n):
     result = []
@@ -22,9 +21,9 @@ def main():
     p = 0.5 * mm
     s = 0.25 * mm
     points = poisson_disc(p, p, w - p * 2, h - p * 2, s, 32)
-    points = planner.sort_points(points)
+    points = xy.sort_points(points)
     print len(points)
-    device = Device()
+    device = xy.Device()
     time.sleep(3)
     device.pen_up()
     device.home()

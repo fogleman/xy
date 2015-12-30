@@ -1,5 +1,3 @@
-from device import Device
-from gcode import GCode
 from shapely.geometry import Polygon, MultiPolygon
 import shapefile
 
@@ -32,13 +30,13 @@ def main():
     states = MultiPolygon(load_shapes(STATES))
     # counties = MultiPolygon(load_shapes(COUNTIES))
     # counties = counties.simplify(100)
-    g = GCode.from_geometry(states)
+    g = xy.GCode.from_geometry(states)
     g = g.rotate(90)
     g = g.scale_to_fit(w, h, p).move(w / 2, p, 0.5, 0)
     # im = g.render(0, 0, w, h, 96 / mm)
     # im.write_to_png('usa.png')
     # g.save('usa.nc')
-    device = Device()
+    device = xy.Device()
     device.home()
     device.gcode(g)
 
