@@ -10,7 +10,7 @@ DOWN = 60
 class Device(object):
 
     def __init__(self, port=PORT, baud=BAUD, up=UP, down=DOWN, verbose=False):
-        self.serial = serial.Serial(port, baud)
+        self.serial = serial.Serial(port, baud) if port else None
         self.up = up
         self.down = down
         self.verbose = verbose
@@ -18,7 +18,7 @@ class Device(object):
     def read(self):
         data = []
         while True:
-            c = self.serial.read(1)
+            c = self.serial.read(1) if self.serial else '\n'
             if c == '\n':
                 return ''.join(data)
             data.append(c)
@@ -27,7 +27,8 @@ class Device(object):
         line = ' '.join(map(str, args))
         if self.verbose:
             print line
-        self.serial.write('%s\n' % line)
+        if self.serial:
+            self.serial.write('%s\n' % line)
         response = self.read()
         if self.verbose:
             print response

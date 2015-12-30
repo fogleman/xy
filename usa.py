@@ -1,5 +1,6 @@
 from shapely.geometry import Polygon, MultiPolygon
 import shapefile
+import xy
 
 STATES = '/Users/fogleman/Workspace/Carolina/shapefiles/cb_2014_us_state_20m/albers.shp'
 COUNTIES = '/Users/fogleman/Workspace/Carolina/shapefiles/cb_2013_us_county_5m/albers.shp'
