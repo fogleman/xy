@@ -1,4 +1,3 @@
-import time
 import xy
 
 def main(iteration):
