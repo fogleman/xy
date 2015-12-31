@@ -1,5 +1,5 @@
 from device import Device
-from lines import Lines
+from drawing import Drawing
 from shapely.geometry import LineString
 import time
 
@@ -11,7 +11,7 @@ def simplify(points, tolerance=0.05):
     return list(line.coords)
 
 def draw(x):
-    if isinstance(x, Lines):
+    if isinstance(x, Drawing):
         x = x.paths
     device = Device()
     time.sleep(2)

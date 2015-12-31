@@ -1,8 +1,8 @@
 from device import Device
 
-from gcode import GCode
+from drawing import Drawing
 
-from lines import Lines
+from gcode import GCode
 
 from planner import sort_paths, sort_points
 

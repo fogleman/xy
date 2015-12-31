@@ -1,4 +1,4 @@
-from lines import Lines
+from drawing import Drawing
 import math
 
 def to_degrees(x):
@@ -29,8 +29,8 @@ class Turtle(object):
         return paths
 
     @property
-    def lines(self):
-        return Lines(self.paths)
+    def drawing(self):
+        return Drawing(self.paths)
 
     def pd(self):
         self.pen = True

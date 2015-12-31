@@ -2,7 +2,7 @@ from shapely.affinity import translate, scale, rotate
 from shapely.geometry import MultiLineString
 import math
 
-class Lines(MultiLineString):
+class Drawing(MultiLineString):
 
     @property
     def paths(self):
@@ -19,13 +19,13 @@ class Lines(MultiLineString):
         return y2 - y1
 
     def translate(self, x, y):
-        return Lines(translate(self, x, y))
+        return Drawing(translate(self, x, y))
 
     def scale(self, x, y, origin='center'):
-        return Lines(scale(self, x, y, origin=origin))
+        return Drawing(scale(self, x, y, origin=origin))
 
     def rotate(self, angle, origin='center'):
-        return Lines(rotate(self, angle, origin=origin))
+        return Drawing(rotate(self, angle, origin=origin))
 
     def move(self, x, y, ax, ay):
         x1, y1, x2, y2 = self.bounds

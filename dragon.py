@@ -9,10 +9,10 @@ def main(iteration):
             t.circle(-1, 90, 36)
         else:
             t.circle(1, 90, 36)
-    lines = t.lines.rotate_and_scale_to_fit(315, 380, step=90)
-    lines.render().write_to_png('dragon.png')
-    lines = xy.Lines([lines.simplify(0.05)])
-    xy.draw(lines)
+    drawing = t.drawing.rotate_and_scale_to_fit(315, 380, step=90)
+    drawing.render().write_to_png('dragon.png')
+    drawing = xy.Drawing([drawing.simplify(0.05)])
+    xy.draw(drawing)
 
 if __name__ == '__main__':
     main(10)
