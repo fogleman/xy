@@ -18,7 +18,7 @@ class Model(object):
             angle = atan2(y - py, x - px)
             dx += pm * cos(angle) / d
             dy += pm * sin(angle) / d
-        angle = atan2(dy, dx) + pi / 2
+        angle = atan2(dy, dx) #+ pi / 2
         dx = cos(angle)
         dy = sin(angle)
         return (dx, dy)
@@ -58,14 +58,14 @@ def main():
     while True:
         paths = []
         print 'generating paths'
-        for _ in range(100):
+        for _ in range(250):
             x = random.random()
             y = random.random()
-            path = create_path(model, 315, 0, 0, x, y, 1, 100)
+            path = create_path(model, 315, 0, 35, x, y, -1, 100)
             path = xy.simplify(path)
             paths.append(path)
         print 'sorting paths'
-        paths = xy.sort_paths(paths)
+        paths = xy.sort_paths(paths, 1000000)
         print 'drawing paths'
         for path in paths:
             total += 1

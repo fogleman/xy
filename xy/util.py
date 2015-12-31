@@ -14,8 +14,9 @@ def draw(x):
     if isinstance(x, Lines):
         x = x.paths
     device = Device()
-    time.sleep(3)
+    time.sleep(2)
     device.pen_up()
+    time.sleep(1)
     device.home()
     for path in x:
         device.draw(path)
