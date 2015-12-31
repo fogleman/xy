@@ -1,3 +1,4 @@
+from lines import Lines
 import math
 
 def to_degrees(x):
@@ -13,18 +14,23 @@ class Turtle(object):
         self.y = 0
         self.h = 0
         self.pen = True
-        self.path = [(self.x, self.y)]
-        self.paths = []
+        self._path = [(self.x, self.y)]
+        self._paths = []
 
     def clear(self):
-        self.path = [(self.x, self.y)]
-        self.paths = []
+        self._path = [(self.x, self.y)]
+        self._paths = []
 
-    def get_paths(self):
-        paths = list(self.paths)
-        if len(self.path) > 1:
-            paths.append(self.path)
+    @property
+    def paths(self):
+        paths = list(self._paths)
+        if len(self._path) > 1:
+            paths.append(self._path)
         return paths
+
+    @property
+    def lines(self):
+        return Lines(self.paths)
 
     def pd(self):
         self.pen = True
@@ -32,9 +38,9 @@ class Turtle(object):
 
     def pu(self):
         self.pen = False
-        if len(self.path) > 1:
-            self.paths.append(self.path)
-            self.path = [(self.x, self.y)]
+        if len(self._path) > 1:
+            self._paths.append(self._path)
+            self._path = [(self.x, self.y)]
     penup = up = pu
 
     def isdown(self):
@@ -44,7 +50,7 @@ class Turtle(object):
         if y is None:
             x, y = x
         if self.pen:
-            self.path.append((x, y))
+            self._path.append((x, y))
         self.x = x
         self.y = y
     setpos = setposition = goto
@@ -126,32 +132,3 @@ class Turtle(object):
         if y is None:
             x, y = x
         return math.hypot(x - self.x, y - self.y)
-
-    def render(self, scale=1, margin=10):
-        import cairo
-        paths = self.get_paths()
-        points = [point for path in paths for point in path]
-        x1 = y1 = x2 = y2 = 0
-        if points:
-            x1 = min(points, key=lambda (x, y): x)[0]
-            x2 = max(points, key=lambda (x, y): x)[0]
-            y1 = min(points, key=lambda (x, y): y)[1]
-            y2 = max(points, key=lambda (x, y): y)[1]
-        width = int(scale * max(x2 - x1, 1) + margin * 2)
-        height = int(scale * max(y2 - y1, 1) + margin * 2)
-        surface = cairo.ImageSurface(cairo.FORMAT_RGB24, width, height)
-        dc = cairo.Context(surface)
-        dc.translate(margin, margin)
-        dc.scale(scale, scale)
-        dc.translate(-x1, -y1)
-        dc.set_source_rgb(1, 1, 1)
-        dc.paint()
-        dc.arc(0, 0, 3, 0, 2 * math.pi)
-        dc.set_source_rgb(1, 0, 0)
-        dc.fill()
-        dc.set_source_rgb(0, 0, 0)
-        for path in paths:
-            for x, y in path:
-                dc.line_to(x, y)
-            dc.stroke()
-        return surface
