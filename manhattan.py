@@ -1,6 +1,6 @@
 from imposm.parser import OSMParser
 from math import radians, sin, cos
-from shapely.geometry import MultiLineString, LineString
+import time
 import xy
 
 LAT, LNG = (40.777274, -73.967161)
@@ -59,6 +59,11 @@ class Handler(object):
         return self.create_path_for_nodes(self.ways[osmid])
 
 def main():
+    device = xy.Device()
+    time.sleep(2)
+    device.pen_up()
+    time.sleep(1)
+    device.home()
     print 'parsing osm file'
     h = Handler()
     p = OSMParser(None, h.on_nodes, h.on_ways, h.on_relations, h.on_coords)
@@ -67,12 +72,16 @@ def main():
     paths = h.create_paths()
     print len(paths)
     print 'creating drawing'
-    drawing = xy.Drawing(paths).scale_to_fit(315, 380)
+    drawing = xy.Drawing(paths).scale(1, -1).scale_to_fit(315, 380)
     # print 'rendering drawing'
     # drawing.render().write_to_png('manhattan.png')
     paths = drawing.paths
-    print 'optimizing path ordering'
-    paths = xy.sort_paths(paths, 1000000)
+    paths.sort(key=lambda path: path[0][1])
+    n = 250
+    for i in range(0, len(paths), n):
+        print i
+        for path in xy.sort_paths(paths[i:i+n], 500000):
+            device.draw(xy.simplify(path, 0.1))
 
 if __name__ == '__main__':
     main()

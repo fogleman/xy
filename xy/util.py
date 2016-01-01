@@ -19,4 +19,4 @@ def draw(x):
     time.sleep(1)
     device.home()
     for path in x:
-        device.draw(path)
+        device.draw(simplify(path))
