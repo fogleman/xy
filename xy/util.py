@@ -10,7 +10,7 @@ def simplify(points, tolerance=0.05):
     line = line.simplify(tolerance)
     return list(line.coords)
 
-def draw(x):
+def draw(x, tolerance=0.05):
     if isinstance(x, Drawing):
         x = x.paths
     device = Device()
@@ -19,4 +19,6 @@ def draw(x):
     time.sleep(1)
     device.home()
     for path in x:
-        device.draw(simplify(path))
+        if tolerance:
+            path = simplify(path, tolerance)
+        device.draw(path)
