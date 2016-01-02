@@ -61,7 +61,7 @@ class Drawing(MultiLineString):
             gs.append((s, g))
         return max(gs, key=lambda x: x[0])[1]
 
-    def render(self, scale=1, margin=10):
+    def render(self, scale=96/25.4, margin=10):
         import cairo
         paths = self.paths
         points = [point for path in paths for point in path]
@@ -76,9 +76,11 @@ class Drawing(MultiLineString):
         surface = cairo.ImageSurface(cairo.FORMAT_RGB24, width, height)
         dc = cairo.Context(surface)
         dc.scale(1, -1)
+        dc.translate(0, -height)
         dc.translate(margin, margin)
+        dc.translate(-x1, -y1)
         dc.scale(scale, scale)
-        dc.translate(-x1, -y1 - height)
+        dc.set_line_width(1.0 / scale)
         dc.set_source_rgb(1, 1, 1)
         dc.paint()
         dc.arc(0, 0, 3, 0, 2 * math.pi)

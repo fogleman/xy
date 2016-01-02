@@ -5,7 +5,7 @@ PORT = '/dev/tty.wchusbserial640'
 BAUD = 115200
 
 UP = 0
-DOWN = 50
+DOWN = 40
 
 class Device(object):
 
@@ -60,6 +60,7 @@ class Device(object):
         for point in points:
             self.move(*point)
         self.pen(up)
+        time.sleep(0.15)
 
     def gcode(self, g):
         for line in g.lines:
