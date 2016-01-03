@@ -4,8 +4,8 @@ import time
 PORT = '/dev/tty.wchusbserial640'
 BAUD = 115200
 
-UP = 0
-DOWN = 40
+UP = 10
+DOWN = 50
 
 class Device(object):
 

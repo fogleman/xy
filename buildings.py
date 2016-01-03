@@ -10,6 +10,16 @@ def isolate_buildings(im):
     n = 3
     return cv2.inRange(im, c - n, c + n)
 
+def combine_images():
+    im1 = cv2.imread('/Users/fogleman/Workspace/maptiles/zoom18t.png')
+    im2 = cv2.imread('/Users/fogleman/Workspace/maptiles/zoom19t.png')
+    im3 = cv2.imread('/Users/fogleman/Workspace/maptiles/zoom20s.png')
+    im1 = isolate_buildings(im1)
+    im2 = isolate_buildings(im2)
+    im3 = isolate_buildings(im3)
+    im = cv2.bitwise_or(cv2.bitwise_or(im1, im2), im3)
+    return im
+
 def find_contours(im):
     print 'find_contours'
     contours, hierarchy = cv2.findContours(
@@ -51,25 +61,29 @@ def main():
     time.sleep(1)
     device.home()
     print 'main'
-    im = cv2.imread('/Users/fogleman/Dropbox/long-beach.png')
+    im = cv2.imread('/Users/fogleman/Workspace/maptiles/zoom20clean.png')
     im = isolate_buildings(im)
+    # im = combine_images()
     contours = find_contours(im)
     contours = filter_contours(contours)
-    # contours = approximate_contours(contours)
-    # im[:] = 0
-    # cv2.drawContours(im, contours, -1, 255, -1)
-    # cv2.imwrite('out.png', im)
+    print len(contours)
+    im[:] = 0
+    cv2.drawContours(im, contours, -1, 255, -1)
+    cv2.imwrite('out.png', im)
     paths = contour_paths(contours)
     print 'scaling paths'
     drawing = xy.Drawing(paths).rotate_and_scale_to_fit(315, 380, step=90).scale(1, -1)
+    drawing = drawing.move(300, 0, 1, 0)
     drawing.render().write_to_png('buildings.png')
     print 'drawing paths'
     paths = drawing.paths
     paths.sort(key=lambda path: path[0][1])
-    n = 250
+    n = 100
     for i in range(0, len(paths), n):
         print i
-        for path in xy.sort_paths(paths[i:i+n], 500000):
+        group = paths[i:i+n]
+        group.sort(key=lambda path: path[0][0])
+        for path in group:
             device.draw(xy.simplify(path, 0.05))
 
 if __name__ == '__main__':
