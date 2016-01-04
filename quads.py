@@ -2,6 +2,7 @@ from PIL import Image, ImageDraw
 from collections import Counter
 import heapq
 import sys
+import xy
 
 MODE_RECTANGLE = 1
 MODE_ELLIPSE = 2
@@ -147,8 +148,6 @@ def main():
                 model.render('frames/%06d.png' % i)
             previous = error
         paths.extend(model.split())
-    print len(paths)
-    print paths[0]
     model.render('output.png')
     print '-' * 32
     depth = Counter(x.depth for x in model.quads)
@@ -161,6 +160,9 @@ def main():
     print '             %8d %8.2f%%' % (len(model.quads), 100)
     # for max_depth in range(max(depth.keys()) + 1):
     #     model.render('out%d.png' % max_depth, max_depth)
+    drawing = xy.Drawing(paths).scale_to_fit(315, 315).rotate(180).scale(1, -1)
+    drawing.render().write_to_png('quads.png')
+    xy.draw(drawing, tolerance=None)
 
 if __name__ == '__main__':
     main()
