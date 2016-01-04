@@ -1,12 +1,24 @@
-from shapely.affinity import translate, scale, rotate
-from shapely.geometry import MultiLineString
 import math
 
-class Drawing(MultiLineString):
+class Drawing(object):
+
+    def __init__(self, paths=None):
+        self.paths = paths or []
+        self._bounds = None
 
     @property
-    def paths(self):
-        return [[(x, y) for x, y in geom.coords] for geom in self.geoms]
+    def bounds(self):
+        if not self._bounds:
+            points = [(x, y) for path in self.paths for x, y in path]
+            if points:
+                x1 = min(x for x, y in points)
+                x2 = max(x for x, y in points)
+                y1 = min(y for x, y in points)
+                y2 = max(y for x, y in points)
+            else:
+                x1 = x2 = y1 = y2 = 0
+            self._bounds = (x1, y1, x2, y2)
+        return self._bounds
 
     @property
     def width(self):
@@ -18,14 +30,25 @@ class Drawing(MultiLineString):
         x1, y1, x2, y2 = self.bounds
         return y2 - y1
 
+    def transform(self, func):
+        return Drawing([[func(x, y) for x, y in path] for path in self.paths])
+
     def translate(self, x, y):
-        return Drawing(translate(self, x, y))
+        def func(px, py):
+            return (px + x, py + y)
+        return self.transform(func)
 
-    def scale(self, x, y, origin='center'):
-        return Drawing(scale(self, x, y, origin=origin))
+    def scale(self, x, y):
+        def func(px, py):
+            return (px * x, py * y)
+        return self.transform(func)
 
-    def rotate(self, angle, origin='center'):
-        return Drawing(rotate(self, angle, origin=origin))
+    def rotate(self, angle):
+        c = math.cos(math.radians(angle))
+        s = math.sin(math.radians(angle))
+        def func(x, y):
+            return (x * c - y * s, y * c + x * s)
+        return self.transform(func)
 
     def move(self, x, y, ax, ay):
         x1, y1, x2, y2 = self.bounds
@@ -38,9 +61,9 @@ class Drawing(MultiLineString):
 
     def rotate_to_fit(self, width, height, step=5):
         for a in range(0, 180, step):
-            g = self.rotate(a).origin()
+            g = self.rotate(a)
             if g.width <= width and g.height <= height:
-                return g
+                return g.origin()
         return None
 
     def scale_to_fit(self, width, height, padding=0):
@@ -56,23 +79,16 @@ class Drawing(MultiLineString):
         for a in range(0, 180, step):
             g = self.rotate(a)
             s = min(width / g.width, height / g.height)
-            # print a, s
-            g = g.scale(s, s).origin()
-            gs.append((s, g))
-        return max(gs, key=lambda x: x[0])[1]
+            gs.append((s, a, g))
+        s, a, g = max(gs)
+        return g.scale(s, s).origin()
 
     def render(self, scale=96/25.4, margin=10):
         import cairo
-        paths = self.paths
-        points = [point for path in paths for point in path]
-        x1 = y1 = x2 = y2 = 0
-        if points:
-            x1 = min(points, key=lambda (x, y): x)[0]
-            x2 = max(points, key=lambda (x, y): x)[0]
-            y1 = min(points, key=lambda (x, y): y)[1]
-            y2 = max(points, key=lambda (x, y): y)[1]
-        width = int(scale * max(x2 - x1, 1) + margin * 2)
-        height = int(scale * max(y2 - y1, 1) + margin * 2)
+        x1, y1, x2, y2 = self.bounds
+        print self.bounds
+        width = int(scale * self.width + margin * 2)
+        height = int(scale * self.height + margin * 2)
         surface = cairo.ImageSurface(cairo.FORMAT_RGB24, width, height)
         dc = cairo.Context(surface)
         dc.scale(1, -1)
@@ -83,11 +99,11 @@ class Drawing(MultiLineString):
         dc.set_line_width(1.0 / scale)
         dc.set_source_rgb(1, 1, 1)
         dc.paint()
-        dc.arc(0, 0, 3, 0, 2 * math.pi)
+        dc.arc(0, 0, 3.0 / scale, 0, 2 * math.pi)
         dc.set_source_rgb(1, 0, 0)
         dc.fill()
         dc.set_source_rgb(0, 0, 0)
-        for path in paths:
+        for path in self.paths:
             for x, y in path:
                 dc.line_to(x, y)
             dc.stroke()

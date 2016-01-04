@@ -8,7 +8,7 @@ def main(iteration):
             t.circle(-1, 90, 36)
         else:
             t.circle(1, 90, 36)
-    drawing = t.drawing.rotate_and_scale_to_fit(315, 380, step=90).scale(1, -1)
+    drawing = t.drawing.rotate_and_scale_to_fit(315, 380, step=90).scale(1, -1).origin()
     drawing.render().write_to_png('dragon.png')
     xy.draw(drawing)
 
