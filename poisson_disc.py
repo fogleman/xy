@@ -6,37 +6,40 @@ class Grid(object):
     def __init__(self, r):
         self.r = r
         self.size = r / 2 ** 0.5
-        self.cells = {}
-    def points(self):
-        return self.cells.values()
+        self.points = {}
+        self.lines = {}
     def normalize(self, x, y):
         i = int(floor(x / self.size))
         j = int(floor(y / self.size))
         return (i, j)
     def nearby(self, x, y):
-        result = []
+        points = []
+        lines = []
         i, j = self.normalize(x, y)
-        for p in xrange(i - 2, i + 3):
-            for q in xrange(j - 2, j + 3):
-                if (p, q) in self.cells:
-                    result.append(self.cells[(p, q)])
-        return result
-    def insert(self, x, y):
-        for bx, by in self.nearby(x, y):
+        for p in range(i - 2, i + 3):
+            for q in range(j - 2, j + 3):
+                if (p, q) in self.points:
+                    points.append(self.points[(p, q)])
+                if (p, q) in self.lines:
+                    lines.append(self.lines[(p, q)])
+        return points, lines
+    def insert(self, x, y, line=None):
+        points, lines = self.nearby(x, y)
+        for bx, by in points:
             if hypot(x - bx, y - by) < self.r:
                 return False
         i, j = self.normalize(x, y)
-        self.cells[(i, j)] = (x, y)
+        if line:
+            for other in lines:
+                if line.crosses(other):
+                    return False
+            self.lines[(i, j)] = line
+        self.points[(i, j)] = (x, y)
         return True
     def remove(self, x, y):
         i, j = self.normalize(x, y)
-        self.cells.pop((i, j))
-
-def check_pairs(line, lines):
-    for other in lines:
-        if line.crosses(other):
-            return False
-    return True
+        self.points.pop((i, j))
+        self.lines.pop((i, j))
 
 def poisson_disc(x1, y1, x2, y2, r, n):
     grid = Grid(r)
@@ -48,28 +51,24 @@ def poisson_disc(x1, y1, x2, y2, r, n):
         if grid.insert(x, y):
             active.append((x, y, a, 0))
     pairs = []
-    lines = []
     while active:
-        ax, ay, aa, ad = random.choice(active)
-        for i in xrange(n):
+        ax, ay, aa, ad = record = random.choice(active)
+        for i in range(n):
             # a = random.random() * 2 * pi
-            a = aa + (random.random() - 0.5) * pi / 2
+            # a = aa + (random.random() - 0.5) * pi / 2
+            a = random.gauss(aa, pi / 8)
             d = random.random() * r + r
             x = ax + cos(a) * d
             y = ay + sin(a) * d
             if x < x1 or y < y1 or x > x2 or y > y2:
                 continue
-            if not grid.insert(x, y):
-                continue
             pair = ((ax, ay), (x, y))
             line = LineString(pair)
-            # if not check_pairs(line, lines):
-            #     grid.remove(x, y)
-            #     continue
+            if not grid.insert(x, y, line):
+                continue
             pairs.append(pair)
-            lines.append(line)
             active.append((x, y, a, ad + d))
             break
         else:
-            active.remove((ax, ay, aa, ad))
-    return grid.points(), pairs
+            active.remove(record)
+    return grid.points.values(), pairs
