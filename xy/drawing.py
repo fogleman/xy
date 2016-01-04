@@ -33,14 +33,14 @@ class Drawing(object):
     def transform(self, func):
         return Drawing([[func(x, y) for x, y in path] for path in self.paths])
 
-    def translate(self, x, y):
-        def func(px, py):
-            return (px + x, py + y)
+    def translate(self, dx, dy):
+        def func(x, y):
+            return (x + dx, y + dy)
         return self.transform(func)
 
-    def scale(self, x, y):
-        def func(px, py):
-            return (px * x, py * y)
+    def scale(self, sx, sy):
+        def func(x, y):
+            return (x * sx, y * sy)
         return self.transform(func)
 
     def rotate(self, angle):
@@ -86,7 +86,6 @@ class Drawing(object):
     def render(self, scale=96/25.4, margin=10):
         import cairo
         x1, y1, x2, y2 = self.bounds
-        print self.bounds
         width = int(scale * self.width + margin * 2)
         height = int(scale * self.height + margin * 2)
         surface = cairo.ImageSurface(cairo.FORMAT_RGB24, width, height)
@@ -96,7 +95,7 @@ class Drawing(object):
         dc.translate(margin, margin)
         dc.translate(-x1, -y1)
         dc.scale(scale, scale)
-        dc.set_line_width(1.0 / scale)
+        dc.set_line_width(2.0 / scale)
         dc.set_source_rgb(1, 1, 1)
         dc.paint()
         dc.arc(0, 0, 3.0 / scale, 0, 2 * math.pi)
