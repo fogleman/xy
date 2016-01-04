@@ -44,15 +44,15 @@ class Grid(object):
 def poisson_disc(x1, y1, x2, y2, r, n):
     grid = Grid(r)
     active = []
-    for _ in range(64):
+    for i in range(64):
         x = x1 + random.random() * (x2 - x1)
         y = y1 + random.random() * (y2 - y1)
         a = random.random() * 2 * pi
         if grid.insert(x, y):
-            active.append((x, y, a, 0))
+            active.append((x, y, a, 0, i))
     pairs = []
     while active:
-        ax, ay, aa, ad = record = random.choice(active)
+        ax, ay, aa, ad, ag = record = random.choice(active)
         for i in range(n):
             # a = random.random() * 2 * pi
             # a = aa + (random.random() - 0.5) * pi / 2
@@ -67,7 +67,7 @@ def poisson_disc(x1, y1, x2, y2, r, n):
             if not grid.insert(x, y, line):
                 continue
             pairs.append(pair)
-            active.append((x, y, a, ad + d))
+            active.append((x, y, a, ad + d, ag))
             break
         else:
             active.remove(record)
