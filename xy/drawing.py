@@ -98,9 +98,9 @@ class Drawing(object):
         dc.set_line_width(2.0 / scale)
         dc.set_source_rgb(1, 1, 1)
         dc.paint()
-        dc.arc(0, 0, 3.0 / scale, 0, 2 * math.pi)
-        dc.set_source_rgb(1, 0, 0)
-        dc.fill()
+        # dc.arc(0, 0, 3.0 / scale, 0, 2 * math.pi)
+        # dc.set_source_rgb(1, 0, 0)
+        # dc.fill()
         dc.set_source_rgb(0, 0, 0)
         for path in self.paths:
             for x, y in path:

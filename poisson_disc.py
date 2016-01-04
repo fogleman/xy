@@ -1,4 +1,5 @@
 from math import pi, sin, cos, hypot, floor
+from shapely.geometry import LineString
 import random
 
 class Grid(object):
@@ -27,17 +28,32 @@ class Grid(object):
         i, j = self.normalize(x, y)
         self.cells[(i, j)] = (x, y)
         return True
+    def remove(self, x, y):
+        i, j = self.normalize(x, y)
+        self.cells.pop((i, j))
+
+def check_pairs(line, lines):
+    for other in lines:
+        if line.crosses(other):
+            return False
+    return True
 
 def poisson_disc(x1, y1, x2, y2, r, n):
-    x = x1 + random.random() * (x2 - x1)
-    y = y1 + random.random() * (y2 - y1)
-    active = [(x, y)]
     grid = Grid(r)
-    grid.insert(x, y)
+    active = []
+    for _ in range(64):
+        x = x1 + random.random() * (x2 - x1)
+        y = y1 + random.random() * (y2 - y1)
+        a = random.random() * 2 * pi
+        if grid.insert(x, y):
+            active.append((x, y, a, 0))
+    pairs = []
+    lines = []
     while active:
-        ax, ay = random.choice(active)
+        ax, ay, aa, ad = random.choice(active)
         for i in xrange(n):
-            a = random.random() * 2 * pi
+            # a = random.random() * 2 * pi
+            a = aa + (random.random() - 0.5) * pi / 2
             d = random.random() * r + r
             x = ax + cos(a) * d
             y = ay + sin(a) * d
@@ -45,8 +61,15 @@ def poisson_disc(x1, y1, x2, y2, r, n):
                 continue
             if not grid.insert(x, y):
                 continue
-            active.append((x, y))
+            pair = ((ax, ay), (x, y))
+            line = LineString(pair)
+            # if not check_pairs(line, lines):
+            #     grid.remove(x, y)
+            #     continue
+            pairs.append(pair)
+            lines.append(line)
+            active.append((x, y, a, ad + d))
             break
         else:
-            active.remove((ax, ay))
-    return grid.points()
+            active.remove((ax, ay, aa, ad))
+    return grid.points(), pairs
