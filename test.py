@@ -1,12 +1,16 @@
 from poisson_disc import poisson_disc
+import random
 import xy
 
-points, pairs = poisson_disc(0, 0, 300, 300, 1, 16)
-# paths = [xy.circle(x, y, 0.5) for x, y in points]
-# paths.extend(pairs)
-paths = pairs
-drawing = xy.Drawing(paths)
+random.seed(123)
+points, pairs = poisson_disc(0, 0, 315, 315, 1, 16)
+drawing = xy.Drawing(pairs)
 print len(drawing.paths)
 drawing = drawing.linemerge()
 print len(drawing.paths)
 drawing.render().write_to_png('test.png')
+paths = drawing.paths
+paths = xy.sort_paths_greedy(paths)
+paths = xy.join_paths(paths)
+print len(paths)
+xy.draw(paths)

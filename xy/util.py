@@ -33,7 +33,8 @@ def draw(x, tolerance=0.05):
     device.pen_up()
     time.sleep(1)
     device.home()
-    for path in x:
+    for i, path in enumerate(x):
+        print i, len(x)
         if tolerance:
             path = simplify(path, tolerance)
         device.draw(path)

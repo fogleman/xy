@@ -2,6 +2,32 @@ from math import hypot
 import anneal
 import random
 
+def sort_paths_greedy(paths, reversable=True):
+    def func1(path):
+        x1, y1 = result[-1][-1]
+        x2, y2 = path[0]
+        return hypot(x2 - x1, y2 - y1)
+    def func2(path):
+        x1, y1 = result[-1][-1]
+        x2, y2 = path[-1]
+        return hypot(x2 - x1, y2 - y1)
+    result = []
+    result.append(paths.pop(0))
+    while paths:
+        if reversable:
+            a = min(paths, key=func1)
+            b = min(paths, key=func2)
+            if func1(a) <= func2(b):
+                new_path = path = a
+            else:
+                path = b
+                new_path = list(reversed(b))
+        else:
+            new_path = path = min(paths, key=func1)
+        result.append(new_path)
+        paths.remove(path)
+    return result
+
 def sort_paths(paths, iterations=100000, reversable=True):
     '''
     This function re-orders a set of 2D paths (polylines) to minimize the

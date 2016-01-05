@@ -57,8 +57,8 @@ void stepperMoveB(int dir)
 
 /************** calculate movements ******************/
 int stepAuxDelay=0;
-int stepdelay_min=200;
-int stepdelay_max=2000;
+int stepdelay_min=250;
+int stepdelay_max=1000;
 #define SPEED_STEP 1
 
 void doMove()
