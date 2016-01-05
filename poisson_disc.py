@@ -41,33 +41,52 @@ class Grid(object):
         self.points.pop((i, j))
         self.lines.pop((i, j))
 
+def max_angle(i, d):
+    a1 = 2 * pi
+    a2 = pi / 2
+    p = min(1, d / 20.0)
+    p = p ** 0.5
+    return a1 + (a2 - a1) * p
+
+def choice(items):
+    # return random.choice(items)
+    p = random.random() ** 0.1
+    return items[int(p * len(items))]
+
 def poisson_disc(x1, y1, x2, y2, r, n):
     grid = Grid(r)
     active = []
-    for i in range(64):
+    for i in range(1):
         x = x1 + random.random() * (x2 - x1)
         y = y1 + random.random() * (y2 - y1)
+        x = (x1 + x2) / 2.0
+        y = (y1 + y2) / 2.0
         a = random.random() * 2 * pi
         if grid.insert(x, y):
-            active.append((x, y, a, 0, i))
+            active.append((x, y, a, 0, 0, i))
     pairs = []
     while active:
-        ax, ay, aa, ad, ag = record = random.choice(active)
+        ax, ay, aa, ai, ad, ag = record = choice(active)
         for i in range(n):
             # a = random.random() * 2 * pi
-            # a = aa + (random.random() - 0.5) * pi / 2
-            a = random.gauss(aa, pi / 8)
+            a = aa + (random.random() - 0.5) * max_angle(ai, ad)
+            # a = random.gauss(aa, pi / 8)
             d = random.random() * r + r
             x = ax + cos(a) * d
             y = ay + sin(a) * d
             if x < x1 or y < y1 or x > x2 or y > y2:
+                continue
+            if ad + d > 150:
                 continue
             pair = ((ax, ay), (x, y))
             line = LineString(pair)
             if not grid.insert(x, y, line):
                 continue
             pairs.append(pair)
-            active.append((x, y, a, ad + d, ag))
+            active.append((x, y, a, ai + 1, ad + d, ag))
+            active.sort(key=lambda x: -x[4])
+            # if random.random() < 0.5:
+            #     active.remove(record)
             break
         else:
             active.remove(record)

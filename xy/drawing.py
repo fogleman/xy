@@ -1,3 +1,5 @@
+from shapely.geometry import LineString, MultiLineString
+from shapely.ops import linemerge
 import math
 
 class Drawing(object):
@@ -29,6 +31,16 @@ class Drawing(object):
     def height(self):
         x1, y1, x2, y2 = self.bounds
         return y2 - y1
+
+    def linemerge(self):
+        lines = linemerge([LineString(x) for x in self.paths])
+        if isinstance(lines, LineString):
+            paths = [list(lines.coords)]
+        elif isinstance(lines, MultiLineString):
+            paths = [list(line.coords) for line in lines.geoms]
+        else:
+            raise Exception
+        return Drawing(paths)
 
     def transform(self, func):
         return Drawing([[func(x, y) for x, y in path] for path in self.paths])
