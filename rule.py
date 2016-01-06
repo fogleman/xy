@@ -1,3 +1,4 @@
+from shapely import geometry
 import xy
 
 def compute_row(rule, previous):
@@ -46,6 +47,12 @@ def crop_diagonal(rows):
             result.append(row[j:-j])
     return result
 
+def trim_pair(pair, d):
+    line = geometry.LineString(pair)
+    p1 = line.interpolate(d)
+    p2 = line.interpolate(line.length - d)
+    return ((p1.x, p1.y), (p2.x, p2.y))
+
 def form_pairs(rows):
     pairs = []
     for y, row in enumerate(rows):
@@ -75,20 +82,21 @@ def create_drawing(rule, h):
     # rows = crop(rows)
     # rows = pad(rows)
     pairs, points = form_pairs(rows)
-    paths = list(pairs)
+    paths = [trim_pair(x, 0.25) for x in pairs]
     for x, y in points:
-        paths.append(xy.circle(x, y, 0.2))
+        paths.append(xy.circle(x, y, 0.25))
     drawing = xy.Drawing(paths)
-    drawing = drawing.scale(5, -5)#.rotate(45)
+    drawing = drawing.scale(1, -1)#.rotate(45)
+    drawing = drawing.rotate_and_scale_to_fit(315, 380, step=90)
     return drawing
 
 def main():
     h = 64
-    for rule in range(256):
+    for rule in [30]:#range(256):
         print rule
         drawing = create_drawing(rule, h)
-        im = drawing.render(line_width=1.25)
-        im.write_to_png('rules/rule%03d.png' % rule)
+        im = drawing.render()#line_width=1.25)
+        im.write_to_png('rule%03d.png' % rule)
 
 if __name__ == '__main__':
     main()
