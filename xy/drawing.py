@@ -14,13 +14,13 @@ def shapely_paths(shape):
 
 class Drawing(object):
 
-    @staticmethod
-    def from_shapely(shape):
-        return Drawing(shapely_paths(shape))
-
     def __init__(self, paths=None):
         self.paths = paths or []
         self._bounds = None
+
+    @staticmethod
+    def from_shapely(shape):
+        return Drawing(shapely_paths(shape))
 
     def to_shapely(self):
         return geometry.MultiLineString(self.paths)

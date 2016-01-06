@@ -15,21 +15,36 @@ def compute_rows(rule, n):
         rows.append(compute_row(rule, rows[-1]))
     return rows
 
-def pad_rows(rows):
+def pad(rows):
     result = []
+    n = len(max(rows, key=len))
     for row in rows:
-        p = (len(rows[-1]) - len(row)) / 2 + 1
+        p = (n - len(row)) / 2 + 1
         row = '.' * p + row + '.' * p
         result.append(row)
     return result
 
+def trim(rows):
+    return [row.strip('.') for row in rows]
+
 def crop(rows):
     w = len(rows[0])
     h = len(rows)
-    n = h / 2 - 1
+    n = h / 2
     i = w / 2 - n / 2
     j = i + n
     return [row[i:j] for row in rows[-n:]]
+
+def crop_diagonal(rows):
+    rows = trim(rows)
+    result = []
+    for i, row in enumerate(rows):
+        if i < len(rows) / 2:
+            result.append(row)
+        else:
+            j = 2 * (i - len(rows) / 2 + 1)
+            result.append(row[j:-j])
+    return result
 
 def form_pairs(rows):
     pairs = []
@@ -55,20 +70,21 @@ def form_pairs(rows):
 
 def create_drawing(rule, h):
     rows = compute_rows(rule, h)
-    rows = pad_rows(rows)
-    rows = crop(rows)
-    rows = pad_rows(rows)
+    rows = pad(rows)
+    # rows = crop_diagonal(rows)
+    # rows = crop(rows)
+    # rows = pad(rows)
     pairs, points = form_pairs(rows)
     paths = list(pairs)
     for x, y in points:
         paths.append(xy.circle(x, y, 0.2))
     drawing = xy.Drawing(paths)
-    drawing = drawing.scale(3, -3)
+    drawing = drawing.scale(5, -5)#.rotate(45)
     return drawing
 
 def main():
-    h = 128
-    for rule in [30]:#range(256):
+    h = 64
+    for rule in range(256):
         print rule
         drawing = create_drawing(rule, h)
         im = drawing.render(line_width=1.25)
