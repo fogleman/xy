@@ -78,25 +78,27 @@ def form_pairs(rows):
 def create_drawing(rule, h):
     rows = compute_rows(rule, h)
     rows = pad(rows)
-    # rows = crop_diagonal(rows)
+    rows = crop_diagonal(rows)
     # rows = crop(rows)
-    # rows = pad(rows)
+    rows = pad(rows)
     pairs, points = form_pairs(rows)
     paths = [trim_pair(x, 0.25) for x in pairs]
     for x, y in points:
         paths.append(xy.circle(x, y, 0.25))
     drawing = xy.Drawing(paths)
-    drawing = drawing.scale(1, -1)#.rotate(45)
-    drawing = drawing.rotate_and_scale_to_fit(315, 380, step=90)
+    drawing = drawing.scale(1, -1).rotate(45)
+    drawing = drawing.scale_to_fit(315, 380)
     return drawing
 
 def main():
-    h = 64
+    h = 128
     for rule in [30]:#range(256):
         print rule
         drawing = create_drawing(rule, h)
         im = drawing.render()#line_width=1.25)
         im.write_to_png('rule%03d.png' % rule)
+        drawing = drawing.sort_paths_greedy()
+        xy.draw(drawing)
 
 if __name__ == '__main__':
     main()
