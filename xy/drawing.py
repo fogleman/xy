@@ -1,12 +1,29 @@
-from shapely.geometry import LineString, MultiLineString
-from shapely.ops import linemerge
+from shapely import geometry, ops
 import math
 
+def shapely_paths(shape):
+    if hasattr(shape, 'coords'):
+        return [list(shape.coords)]
+    elif hasattr(shape, 'geoms'):
+        paths = []
+        for child in shape.geoms:
+            paths.extend(shapely_paths(child))
+        return paths
+    else:
+        raise Exception
+
 class Drawing(object):
+
+    @staticmethod
+    def from_shapely(shape):
+        return Drawing(shapely_paths(shape))
 
     def __init__(self, paths=None):
         self.paths = paths or []
         self._bounds = None
+
+    def to_shapely(self):
+        return geometry.MultiLineString(self.paths)
 
     @property
     def bounds(self):
@@ -32,15 +49,15 @@ class Drawing(object):
         x1, y1, x2, y2 = self.bounds
         return y2 - y1
 
+    def crop(self, x1, y1, x2, y2):
+        box = geometry.Polygon([
+            (x1, y1), (x2, y1), (x2, y2), (x1, y2), (x1, y1),
+        ])
+        return Drawing.from_shapely(box.intersection(self.to_shapely()))
+
     def linemerge(self):
-        lines = linemerge([LineString(x) for x in self.paths])
-        if isinstance(lines, LineString):
-            paths = [list(lines.coords)]
-        elif isinstance(lines, MultiLineString):
-            paths = [list(line.coords) for line in lines.geoms]
-        else:
-            raise Exception
-        return Drawing(paths)
+        lines = ops.linemerge([geometry.LineString(x) for x in self.paths])
+        return Drawing.from_shapely(lines)
 
     def transform(self, func):
         return Drawing([[func(x, y) for x, y in path] for path in self.paths])
@@ -95,17 +112,18 @@ class Drawing(object):
         s, a, g = max(gs)
         return g.scale(s, s).origin()
 
-    def render(self, scale=96/25.4, margin=10):
+    def render(self, scale=96/25.4, margin=10, line_width=0.5):
         import cairo
         x1, y1, x2, y2 = self.bounds
         width = int(scale * self.width + margin * 2)
         height = int(scale * self.height + margin * 2)
         surface = cairo.ImageSurface(cairo.FORMAT_RGB24, width, height)
         dc = cairo.Context(surface)
+        dc.set_line_cap(cairo.LINE_CAP_ROUND)
         dc.translate(margin, height - margin)
         dc.scale(scale, -scale)
         dc.translate(-x1, -y1)
-        dc.set_line_width(2.0 / scale)
+        dc.set_line_width(line_width)
         dc.set_source_rgb(1, 1, 1)
         dc.paint()
         # dc.arc(0, 0, 3.0 / scale, 0, 2 * math.pi)
@@ -113,7 +131,8 @@ class Drawing(object):
         # dc.fill()
         dc.set_source_rgb(0, 0, 0)
         for path in self.paths:
+            dc.move_to(*path[0])
             for x, y in path:
                 dc.line_to(x, y)
-            dc.stroke()
+        dc.stroke()
         return surface
