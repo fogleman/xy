@@ -150,7 +150,10 @@ def test(n_paths, n_iterations, seed=None):
         path = [(x1, y1), (x2, y2)]
         paths.append(path)
     before = Model(paths).energy()
-    paths = sort_paths(paths, n_iterations)
+    if n_iterations:
+        paths = sort_paths(paths, n_iterations)
+    else:
+        paths = sort_paths_greedy(paths)
     after = Model(paths).energy()
     pct = 100.0 * after / before
     return pct
@@ -158,6 +161,6 @@ def test(n_paths, n_iterations, seed=None):
 if __name__ == '__main__':
     # test the module
     for n_paths in [10, 100, 1000, 10000]:
-        for n_iterations in [10, 100, 1000, 10000, 100000, 1000000]:
+        for n_iterations in [None, 10, 100, 1000, 10000, 100000, 1000000]:
             pct = test(n_paths, n_iterations, 123)
             print n_paths, n_iterations, pct
