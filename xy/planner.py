@@ -1,31 +1,29 @@
+from hashindex import Index
 from math import hypot
 import anneal
 import random
 
 def sort_paths_greedy(paths, reversable=True):
-    def func1(path):
-        x1, y1 = result[-1][-1]
-        x2, y2 = path[0]
-        return hypot(x2 - x1, y2 - y1)
-    def func2(path):
-        x1, y1 = result[-1][-1]
+    result = [paths.pop(0)]
+    points = []
+    for path in paths:
+        x1, y1 = path[0]
         x2, y2 = path[-1]
-        return hypot(x2 - x1, y2 - y1)
-    result = []
-    result.append(paths.pop(0))
-    while paths:
+        points.append((x1, y1, path, False))
         if reversable:
-            a = min(paths, key=func1)
-            b = min(paths, key=func2)
-            if func1(a) <= func2(b):
-                new_path = path = a
-            else:
-                path = b
-                new_path = list(reversed(b))
+            points.append((x2, y2, path, True))
+    index = Index(points)
+    while index.size:
+        x, y, path, reverse = index.search(result[-1][-1])
+        x1, y1 = path[0]
+        x2, y2 = path[-1]
+        index.remove((x1, y1, path, False))
+        if reversable:
+            index.remove((x2, y2, path, True))
+        if reverse:
+            result.append(list(reversed(path)))
         else:
-            new_path = path = min(paths, key=func1)
-        result.append(new_path)
-        paths.remove(path)
+            result.append(path)
     return result
 
 def sort_paths(paths, iterations=100000, reversable=True):
