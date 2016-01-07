@@ -38,3 +38,19 @@ def draw(x, tolerance=0.05):
         if tolerance:
             path = simplify(path, tolerance)
         device.draw(path)
+
+def parse_svg_path(line):
+    paths = []
+    path = []
+    for token in line.split():
+        cmd = token[0].upper()
+        x, y = map(float, token[1:].split(','))
+        if cmd == 'M':
+            if len(path) > 1:
+                paths.append(path)
+            path = [(x, y)]
+        elif cmd == 'L':
+            path.append((x, y))
+    if len(path) > 1:
+        paths.append(path)
+    return paths
