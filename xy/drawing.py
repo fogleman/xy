@@ -53,6 +53,9 @@ class Drawing(object):
     def sort_paths_greedy(self, reversable=True):
         return Drawing(planner.sort_paths_greedy(self.paths, reversable))
 
+    def sort_paths(self, iterations=100000, reversable=True):
+        return Drawing(planner.sort_paths(self.paths, iterations, reversable))
+
     def crop(self, x1, y1, x2, y2):
         box = geometry.Polygon([
             (x1, y1), (x2, y1), (x2, y2), (x1, y2), (x1, y1),

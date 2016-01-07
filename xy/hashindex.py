@@ -37,7 +37,7 @@ class Index(object):
             points.extend(self.load_ring(i, j, r))
             r += 1
         points.extend(self.load_ring(i, j, r))
-        return min(points, key=lambda pt: (hypot(x - pt[0], y - pt[1], pt[0], pt[1])))
+        return min(points, key=lambda pt: (hypot(x - pt[0], y - pt[1]), pt[0], pt[1]))
     def load_ring(self, i, j, r):
         result = []
         for p in range(i - r, i + r + 1):
