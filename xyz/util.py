@@ -130,6 +130,8 @@ def ray_cube_intersection(a, b, o, d):
     t1 = fx
     if fy < t1: t1 = fy
     if fz < t1: t1 = fz
+    if t0 < 0 and t1 > 0:
+        return 0
     if t0 >= 0 and t0 < t1:
         return t0
     return None
