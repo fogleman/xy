@@ -277,20 +277,9 @@ class Matrix(object):
         s = cross(f, up)
         u = cross(s, f)
         matrix = Matrix([
-            s[0], s[1], s[2], -eye[0],
-            u[0], u[1], u[2], -eye[1],
-            -f[0], -f[1], -f[2], -eye[2],
-            0, 0, 0, 1,
-        ]).transpose()#.translate(neg(eye))
-        return matrix * self
-        ###
-        forward = normalize(sub(center, eye))
-        side = normalize(cross(forward, up))
-        up = cross(side, forward)
-        matrix = Matrix([
-            side[0], side[1], side[2], 0,
-            up[0], up[1], up[2], 0,
-            -forward[0], -forward[1], -forward[2], 0,
-            0, 0, 0, 1,
-        ]).translate(neg(eye))
+            s[0], s[1], s[2], 0,
+            u[0], u[1], u[2], 0,
+            -f[0], -f[1], -f[2], 0,
+            eye[0], eye[1], eye[2], 1,
+        ]).inverse()
         return matrix * self

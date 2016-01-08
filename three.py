@@ -7,16 +7,21 @@ def cube(x, y, z):
 def main():
     paths = []
     paths.extend(cube(0, 0, 0).paths())
+    paths.extend(cube(-1, 0, 0).paths())
     paths.extend(cube(-2, 0, 0).paths())
+    paths.extend(cube(1, 0, 0).paths())
     paths.extend(cube(2, 0, 0).paths())
-    m = xyz.Matrix().look_at((0, 4, 5), (0, 0, 0), (0, 1, 0))
-    m = m.perspective(40, 1, 0.01, 10)
+    paths.extend(cube(0, 0, 1).paths())
+    paths.extend(cube(0, 0, 2).paths())
+    m = xyz.Matrix().look_at((-3, 3, 6), (0, 0, 0), (0, 1, 0))
+    m = m.perspective(60, 1, 0.1, 10)
     # m = m.orthographic(-1, 1, -1, 1, -10, 10)
     paths = [[(m * (x, y, z, 1)) for x, y, z in path] for path in paths]
-    paths = [[xyz.div_scalar(p, p[3])[:3] for p in path] for path in paths]
-    paths = [[p[:2] for p in path if -1 <= p[-1] <= 1] for path in paths]
+    paths = [[xyz.div_scalar(p, p[3])[:2] for p in path] for path in paths]
+    # paths = [[p[:2] for p in path if -1 <= p[-1] <= 1] for path in paths]
     paths = filter(None, paths)
-    drawing = xy.Drawing(paths).scale(10, 10)
+    paths.append([(-1, -1), (1, -1), (1, 1), (-1, 1), (-1, -1)])
+    drawing = xy.Drawing(paths).scale(100, 100)
     drawing.render().write_to_png('three.png')
 
 if __name__ == '__main__':
