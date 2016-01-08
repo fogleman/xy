@@ -1,14 +1,13 @@
 from matrix import Matrix
 import itertools
+import tree
 import util
 
 class Scene(object):
 
-    def __init__(self, shapes=None):
-        self.shapes = shapes or []
-
-    def add(self, shape):
-        self.shapes.append(shape)
+    def __init__(self, shapes):
+        self.shapes = shapes
+        self.tree = tree.Tree(shapes)
 
     def paths(self):
         result = []
@@ -16,10 +15,8 @@ class Scene(object):
             result.extend(shape.paths())
         return result
 
-    def intersect(self, o, d):
-        ts = [x.intersect(o, d) for x in self.shapes]
-        ts = [x for x in ts if x is not None]
-        return min(ts) if ts else None
+    def intersect(self, o, d, tmin, tmax):
+        return self.tree.intersect(o, d, tmin, tmax)
 
     def clip_paths(self, eye, step):
         paths = self.paths()
@@ -43,10 +40,8 @@ class Scene(object):
         v = util.sub(eye, point)
         o = point
         d = util.normalize(v)
-        t = self.intersect(o, d)
-        if t is not None and t < util.length(v):
-            return False
-        return True
+        t = self.intersect(o, d, 0, util.length(v))
+        return t is None
 
     def render(self, eye, center, up, fovy, aspect, znear, zfar, step=None):
         def inside(p):

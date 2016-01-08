@@ -26,6 +26,9 @@ class Cube(object):
         self.a = a
         self.b = b
 
+    def box(self):
+        return (self.a, self.b)
+
     def paths(self):
         x1, y1, z1 = self.a
         x2, y2, z2 = self.b

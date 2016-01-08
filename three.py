@@ -19,7 +19,7 @@ def main():
     drawing = xy.Drawing(paths).rotate(90).scale_to_fit(315, 380)
     drawing = drawing.sort_paths_greedy().join_paths()
     drawing.render().write_to_png('three.png')
-    xy.draw(drawing)
+    # xy.draw(drawing)
 
 if __name__ == '__main__':
     main()
