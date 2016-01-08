@@ -32,7 +32,7 @@ def mul(v1, v2):
     return tuple(a * b for a, b in zip(v1, v2))
 
 def div(v1, v2):
-    return tuple(a / b for a, b in zip(v1, v2))
+    return tuple(a / b if b else 0 for a, b in zip(v1, v2))
 
 def mul_scalar(v, s):
     return tuple(a * s for a in v)
@@ -51,6 +51,19 @@ def vector_max(v1, v2):
 
 def interpolate(v1, v2, t):
     return add(v1, mul_scalar(sub(v2, v1), t))
+
+def chop(path, step):
+    result = []
+    for a, b in zip(path, path[1:]):
+        v = sub(b, a)
+        l = length(v)
+        result.append(a)
+        d = step
+        while d < l:
+            result.append(interpolate(a, b, d / l))
+            d += step
+        result.append(b)
+    return result
 
 def normal_from_points(a, b, c):
     x1, y1, z1 = a
@@ -107,6 +120,6 @@ def ray_cube_intersection(a, b, o, d):
     n, f = vector_min(n, f), vector_max(n, f)
     t0 = max(max(n[0], n[1]), n[2])
     t1 = min(min(f[0], f[1]), f[2])
-    if t0 > 0 and t0 < t1:
+    if t0 >= 0 and t0 < t1:
         return t0
     return None

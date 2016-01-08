@@ -1,3 +1,6 @@
+import itertools
+import util
+
 class Scene(object):
 
     def __init__(self, shapes=None):
@@ -12,10 +15,34 @@ class Scene(object):
             result.extend(shape.paths())
         return result
 
-    def clip_paths(self, eye, step=0.1):
+    def intersect(self, o, d):
+        ts = [x.intersect(o, d) for x in self.shapes]
+        ts = [x for x in ts if x is not None]
+        return min(ts) if ts else None
+
+    def clip_paths(self, eye, step):
         paths = self.paths()
         result = []
         for path in paths:
-            for (x1, y1), (x2, y2) in zip(path, path[1:]):
-                pass
+            result.extend(self.clip(path, eye, step))
         return result
+
+    def clip(self, path, eye, step):
+        result = []
+        points = util.chop(path, step)
+        visible = [self.visible(eye, point) for point in points]
+        items = zip(visible, points)
+        for visible, group in itertools.groupby(items, lambda x: x[0]):
+            points = [x[1] for x in group]
+            if visible and len(points) > 1:
+                result.append(points)
+        return result
+
+    def visible(self, eye, point):
+        v = util.sub(eye, point)
+        o = point
+        d = util.normalize(v)
+        t = self.intersect(o, d)
+        if t is not None and t < util.length(v):
+            return False
+        return True

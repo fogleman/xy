@@ -5,16 +5,19 @@ def cube(x, y, z):
     return xyz.Cube((x - 0.5, y - 0.5, z - 0.5), (x + 0.5, y + 0.5, z + 0.5))
 
 def main():
-    paths = []
-    paths.extend(cube(0, 0, 0).paths())
-    paths.extend(cube(0, 1, 0).paths())
-    paths.extend(cube(0, 2, 0).paths())
-    paths.extend(cube(-1, 0, 0).paths())
-    paths.extend(cube(-2, 0, 0).paths())
-    paths.extend(cube(1, 0, 0).paths())
-    paths.extend(cube(2, 0, 0).paths())
-    paths.extend(cube(0, 0, 1).paths())
-    paths.extend(cube(0, 0, 2).paths())
+    scene = xyz.Scene([
+        cube(0, 0, 0),
+        cube(0, 1, 0),
+        cube(0, 2, 0),
+        cube(-1, 0, 0),
+        cube(-2, 0, 0),
+        cube(1, 0, 0),
+        cube(2, 0, 0),
+        cube(0, 0, 1),
+        cube(0, 0, 2),
+    ])
+    paths = scene.clip_paths((-2, 3, 6), 0.01)
+    # paths = scene.paths()
     m = xyz.Matrix().look_at((-2, 3, 6), (0, 0, 0), (0, 1, 0))
     m = m.perspective(60, 1, 0.1, 10)
     # m = m.orthographic(-2, 2, -2, 2, -10, 10)
