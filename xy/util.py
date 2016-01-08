@@ -1,6 +1,6 @@
 from device import Device
-from drawing import Drawing
 from shapely.geometry import LineString
+import drawing
 import math
 import time
 
@@ -26,7 +26,7 @@ def join_paths(paths, tolerance=0.05):
     return result
 
 def draw(x, tolerance=0.05):
-    if isinstance(x, Drawing):
+    if isinstance(x, drawing.Drawing):
         x = x.paths
     device = Device()
     time.sleep(2)

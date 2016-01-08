@@ -17,9 +17,9 @@ def main():
     paths = scene.render((20, 10, 20), (0, 0, 0), (0, 1, 0), 60, 1, 0.1, 100, 0.05)
     # paths.append([(-1, -1), (1, -1), (1, 1), (-1, 1), (-1, -1)])
     drawing = xy.Drawing(paths).rotate(90).scale_to_fit(315, 380)
-    drawing = drawing.sort_paths_greedy()
+    drawing = drawing.sort_paths_greedy().join_paths()
     drawing.render().write_to_png('three.png')
-    # xy.draw(drawing)
+    xy.draw(drawing)
 
 if __name__ == '__main__':
     main()

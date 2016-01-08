@@ -1,6 +1,7 @@
 from shapely import geometry, ops
 import math
 import planner
+import util
 
 def shapely_paths(shape):
     if hasattr(shape, 'coords'):
@@ -55,6 +56,9 @@ class Drawing(object):
 
     def sort_paths(self, iterations=100000, reversable=True):
         return Drawing(planner.sort_paths(self.paths, iterations, reversable))
+
+    def join_paths(self, tolerance=0.05):
+        return Drawing(util.join_paths(self.paths, tolerance))
 
     def crop(self, x1, y1, x2, y2):
         box = geometry.Polygon([
