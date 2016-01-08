@@ -115,11 +115,21 @@ def ray_triangle_intersection(v1, v2, v3, o, d):
     return None
 
 def ray_cube_intersection(a, b, o, d):
-    n = div(sub(a, o), d)
-    f = div(sub(b, o), d)
-    n, f = vector_min(n, f), vector_max(n, f)
-    t0 = max(max(n[0], n[1]), n[2])
-    t1 = min(min(f[0], f[1]), f[2])
+    nx = (a[0] - o[0]) / d[0] if d[0] else 0
+    ny = (a[1] - o[1]) / d[1] if d[1] else 0
+    nz = (a[2] - o[2]) / d[2] if d[2] else 0
+    fx = (b[0] - o[0]) / d[0] if d[0] else 0
+    fy = (b[1] - o[1]) / d[1] if d[1] else 0
+    fz = (b[2] - o[2]) / d[2] if d[2] else 0
+    if nx > fx: nx, fx = fx, nx
+    if ny > fy: ny, fy = fy, ny
+    if nz > fz: nz, fz = fz, nz
+    t0 = nx
+    if ny > t0: t0 = ny
+    if nz > t0: t0 = nz
+    t1 = fx
+    if fy < t1: t1 = fy
+    if fz < t1: t1 = fz
     if t0 >= 0 and t0 < t1:
         return t0
     return None
