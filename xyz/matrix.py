@@ -102,6 +102,34 @@ class Matrix(object):
             a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3,
         )
 
+    def ray_multiply(self, o, d):
+        ox, oy, oz = o
+        dx, dy, dz = d
+        o = self * (ox, oy, oz, 1)
+        d = self * (dx, dy, dz, 0)
+        return (o, d)
+
+    def box_multiply(self, a, b):
+        (
+            a00, a10, a20, a30, a01, a11, a21, a31,
+            a02, a12, a22, a32, a03, a13, a23, a33,
+        ) = self.value
+        minx, maxx = a[0], b[0]
+        miny, maxy = a[1], b[1]
+        minz, maxz = a[2], b[2]
+        xa = a00 * minx + a10 * minx + a20 * minx + a30 * minx
+        xb = a00 * maxx + a10 * maxx + a20 * maxx + a30 * maxx
+        ya = a01 * miny + a11 * miny + a21 * miny + a31 * miny
+        yb = a01 * maxy + a11 * maxy + a21 * maxy + a31 * maxy
+        za = a02 * minz + a12 * minz + a22 * minz + a32 * minz
+        zb = a02 * maxz + a12 * maxz + a22 * maxz + a32 * maxz
+        minx, maxx = min(xa, xb), max(xa, xb)
+        miny, maxy = min(ya, yb), max(ya, yb)
+        minz, maxz = min(za, zb), max(za, zb)
+        a = (minx + a03, miny + a13, minz + a23)
+        b = (maxx + a03, maxy + a13, maxz + a23)
+        return (a, b)
+
     def identity(self):
         return Matrix()
 

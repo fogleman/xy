@@ -65,12 +65,11 @@ class Cube(object):
 
 class Sphere(object):
 
-    def __init__(self, detail, radius=0.5, center=(0, 0, 0)):
-        self.detail = detail
+    def __init__(self, radius=0.5, center=(0, 0, 0)):
         self.radius = radius
         self.center = center
         self._paths = self.lat_lng_paths()
-        # self.setup()
+        # self._paths = self.triangle_paths(5)
 
     def lat_lng_paths(self):
         def xyz(lat, lng, radius):
@@ -78,7 +77,7 @@ class Sphere(object):
             x = radius * cos(lat) * cos(lng)
             y = radius * cos(lat) * sin(lng)
             z = radius * sin(lat)
-            return (x, z, y)
+            return (x, y, z)
         paths = []
         for lat in range(-90, 91, 5):
             path = []
@@ -92,7 +91,8 @@ class Sphere(object):
             paths.append(path)
         return paths
 
-    def setup(self):
+    def triangle_paths(self, detail):
+        paths = []
         indices = [
             (0, 3, 4), (0, 4, 1), (5, 4, 3), (5, 1, 4),
             (2, 3, 0), (1, 2, 0), (3, 2, 5), (2, 1, 5),
@@ -103,9 +103,11 @@ class Sphere(object):
         ]
         for a, b, c in indices:
             vertices = (positions[a], positions[b], positions[c])
-            self._setup(self.detail, vertices)
+            paths.extend(self._triangle_paths(detail, vertices))
+        return paths
 
-    def _setup(self, detail, vertices):
+    def _triangle_paths(self, detail, vertices):
+        paths = []
         a, b, c = vertices
         r = self.radius
         p = self.center
@@ -113,17 +115,18 @@ class Sphere(object):
             v1 = tuple(r * a[i] + p[i] for i in xrange(3))
             v2 = tuple(r * b[i] + p[i] for i in xrange(3))
             v3 = tuple(r * c[i] + p[i] for i in xrange(3))
-            self._paths.append((v1, v2))
-            self._paths.append((v2, v3))
-            self._paths.append((v3, v1))
+            paths.append((v1, v2))
+            paths.append((v2, v3))
+            paths.append((v3, v1))
         else:
             ab = util.normalize([(a[i] + b[i]) / 2.0 for i in xrange(3)])
             ac = util.normalize([(a[i] + c[i]) / 2.0 for i in xrange(3)])
             bc = util.normalize([(b[i] + c[i]) / 2.0 for i in xrange(3)])
-            self._setup(detail - 1, (a, ab, ac))
-            self._setup(detail - 1, (b, bc, ab))
-            self._setup(detail - 1, (c, ac, bc))
-            self._setup(detail - 1, (ab, bc, ac))
+            paths.extend(self._triangle_paths(detail - 1, (a, ab, ac)))
+            paths.extend(self._triangle_paths(detail - 1, (b, bc, ab)))
+            paths.extend(self._triangle_paths(detail - 1, (c, ac, bc)))
+            paths.extend(self._triangle_paths(detail - 1, (ab, bc, ac)))
+        return paths
 
     def box(self):
         x, y, z = self.center
@@ -150,3 +153,60 @@ class Sphere(object):
             if t2 > 0:
                 return t2
         return None
+
+class Disk(object):
+
+    def __init__(self, radius=0.5, z=0):
+        self.radius = radius
+        self.z = z
+
+    def box(self):
+        r = self.radius
+        z = self.z
+        return ((-r, -r, z), (r, r, z))
+
+    def paths(self):
+        result = []
+        r = self.radius
+        z = self.z
+        outer = []
+        for a in range(0, 361, 5):
+            a = radians(a)
+            x = r * cos(a)
+            y = r * sin(a)
+            outer.append((x, y, z))
+            result.append([(0, 0, z), (x, y, z)])
+        result.append(outer)
+        return result
+
+    def intersect(self, o, d):
+        if abs(d[2]) < 1e-6:
+            return None
+        t = (self.z - o[2]) / d[2]
+        if t <= 1e-6:
+            return None
+        p = util.add(o, util.mul_scalar(d, t))
+        dist = (p[0] * p[0] + p[1] * p[1]) ** 0.5
+        if dist > self.radius:
+            return None
+        return t
+
+class TransformedShape(object):
+
+    def __init__(self, shape, matrix):
+        self.shape = shape
+        self.matrix = matrix
+        self.inverse = matrix.inverse()
+
+    def box(self):
+        a, b = self.shape.box()
+        return self.matrix.box_multiply(a, b)
+
+    def paths(self):
+        paths = self.shape.paths()
+        matrix = self.matrix
+        return [[matrix * point for point in path] for path in paths]
+
+    def intersect(self, o, d):
+        o, d = self.inverse.ray_multiply(o, d)
+        return self.shape.intersect(o, d)
