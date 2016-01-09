@@ -5,7 +5,7 @@ PORT = '/dev/tty.wchusbserial640'
 BAUD = 115200
 
 UP = 10
-DOWN = 50
+DOWN = 40
 
 class Device(object):
 

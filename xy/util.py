@@ -2,6 +2,7 @@ from device import Device
 from shapely.geometry import LineString
 import drawing
 import math
+import progressbar
 import time
 
 def simplify(points, tolerance=0.05):
@@ -33,8 +34,8 @@ def draw(x, tolerance=0.05):
     device.pen_up()
     time.sleep(1)
     device.home()
-    for i, path in enumerate(x):
-        print i, len(x)
+    bar = progressbar.ProgressBar()
+    for path in bar(x):
         if tolerance:
             path = simplify(path, tolerance)
         device.draw(path)
