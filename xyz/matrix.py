@@ -116,7 +116,7 @@ class Matrix(object):
         dx, dy, dz = d
         o = self * (ox, oy, oz, 1)
         d = self * (dx, dy, dz, 0)
-        return (o, d)
+        return (o[:3], d[:3])
 
     def box_multiply(self, a, b):
         (

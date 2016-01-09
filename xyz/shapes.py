@@ -80,14 +80,15 @@ class Sphere(object):
             z = cz + radius * sin(lat)
             return (x, y, z)
         paths = []
-        for lat in range(-90, 91, 5):
+        n = 10
+        for lat in range(-90 + n, 91 - n, n):
             path = []
             for lng in range(0, 361):
                 path.append(xyz(lat, lng, self.radius))
             paths.append(path)
-        for lng in range(0, 361, 5):
+        for lng in range(0, 361, n):
             path = []
-            for lat in range(-90, 91):
+            for lat in range(-90 + n, 91 - n):
                 path.append(xyz(lat, lng, self.radius))
             paths.append(path)
         return paths
@@ -171,7 +172,7 @@ class Disk(object):
         r = self.radius
         z = self.z
         outer = []
-        for a in range(0, 361, 5):
+        for a in range(0, 361, 10):
             a = radians(a)
             x = r * cos(a)
             y = r * sin(a)
@@ -207,7 +208,7 @@ class Cylinder(object):
         result = []
         lower = []
         upper = []
-        for a in range(0, 361, 5):
+        for a in range(0, 361, 10):
             a = radians(a)
             x = self.radius * cos(a)
             y = self.radius * sin(a)
