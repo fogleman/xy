@@ -99,16 +99,20 @@ def main():
     random.seed(115)
     occupied = set()
     pipes = [Pipe(occupied) for _ in range(PIPES)]
-    for _ in range(40):
+    for _ in range(600):
+        done = True
         for pipe in pipes:
-            pipe.update()
+            if pipe.update():
+                done = False
+        if done:
+            break
     shapes = []
     for pipe in pipes:
         pipe.add_sphere(pipe.position)
         shapes.extend(pipe.shapes)
     print len(shapes)
     scene = xyz.Scene(shapes)
-    paths = scene.render((25, 25, 5), (0, 0, 0), (0, 0, 1), 60, 1, 0.1, 100, 0.05)
+    paths = scene.render((25, 25, 7), (0, 0, 0), (0, 0, 1), 60, 1, 0.1, 100, 0.05)
     # paths.append([(-1, -1), (1, -1), (1, 1), (-1, 1), (-1, -1)])
     drawing = xy.Drawing(paths).rotate(90).scale_to_fit(315, 380).rotate(-90)
     # drawing = drawing.sort_paths_greedy().join_paths()
