@@ -72,11 +72,12 @@ class Sphere(object):
         # self._paths = self.triangle_paths(5)
 
     def lat_lng_paths(self):
+        cx, cy, cz = self.center
         def xyz(lat, lng, radius):
             lat, lng = radians(lat), radians(lng)
-            x = radius * cos(lat) * cos(lng)
-            y = radius * cos(lat) * sin(lng)
-            z = radius * sin(lat)
+            x = cx + radius * cos(lat) * cos(lng)
+            y = cy + radius * cos(lat) * sin(lng)
+            z = cz + radius * sin(lat)
             return (x, y, z)
         paths = []
         for lat in range(-90, 91, 5):
@@ -190,6 +191,53 @@ class Disk(object):
         if dist > self.radius:
             return None
         return t
+
+class Cylinder(object):
+
+    def __init__(self, radius=1, z0=-1, z1=1):
+        self.radius = radius
+        self.z0 = z0
+        self.z1 = z1
+
+    def box(self):
+        r = self.radius
+        return ((-r, -r, self.z0), (r, r, self.z1))
+
+    def paths(self):
+        result = []
+        lower = []
+        upper = []
+        for a in range(0, 361, 5):
+            a = radians(a)
+            x = self.radius * cos(a)
+            y = self.radius * sin(a)
+            lower.append((x, y, self.z0))
+            upper.append((x, y, self.z1))
+            result.append([(x, y, self.z0), (x, y, self.z1)])
+        result.append(lower)
+        result.append(upper)
+        return result
+
+    def intersect(self, o, d):
+        r = self.radius
+        a = d[0] * d[0] + d[1] * d[1]
+        b = 2 * o[0] * d[0] + 2 * o[1] * d[1]
+        c = o[0] * o[0] + o[1] * o[1] - r * r
+        q = b * b - 4 * a * c
+        if q < 0:
+            return None
+        s = q ** 0.5
+        t0 = (-b + s) / (2 * a)
+        t1 = (-b - s) / (2 * a)
+        if t0 > t1:
+            t0, t1 = t1, t0
+        z0 = o[2] + t0 * d[2]
+        z1 = o[2] + t1 * d[2]
+        if t0 > 1e-6 and self.z0 < z0 < self.z1:
+            return t0
+        if t1 > 1e-6 and self.z0 < z1 < self.z1:
+            return t1
+        return None
 
 class TransformedShape(object):
 

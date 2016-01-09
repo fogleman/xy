@@ -3,6 +3,15 @@ from __future__ import division
 from math import sin, cos, tan, pi
 from util import normalize, sub, cross, neg
 
+def translate(value):
+    return Matrix().translate(value)
+
+def scale(value):
+    return Matrix().scale(value)
+
+def rotate(vector, angle):
+    return Matrix().rotate(vector, angle)
+
 class Matrix(object):
 
     def __init__(self, value=None):
