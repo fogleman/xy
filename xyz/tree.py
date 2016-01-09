@@ -21,6 +21,8 @@ class Node(object):
         point = self.point
         if axis is None:
             return self.intersect_shapes(o, d)
+        if d[axis] == 0:
+            return None
         tsplit = (point - o[axis]) / d[axis]
         if (o[axis] < point) or (o[axis] == point and d[axis] <= 0):
             first, second = self.left, self.right

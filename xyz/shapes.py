@@ -80,7 +80,7 @@ class Sphere(object):
             z = cz + radius * sin(lat)
             return (x, y, z)
         paths = []
-        n = 10
+        n = 30
         for lat in range(-90 + n, 91 - n, n):
             path = []
             for lng in range(0, 361):
@@ -208,7 +208,7 @@ class Cylinder(object):
         result = []
         lower = []
         upper = []
-        for a in range(0, 361, 10):
+        for a in range(0, 361, 30):
             a = radians(a)
             x = self.radius * cos(a)
             y = self.radius * sin(a)
