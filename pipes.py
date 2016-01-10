@@ -4,7 +4,7 @@ import xy
 import xyz
 
 PIPES = 8
-SIZE = 5
+SIZE = 3
 TURN_PROBABILITY = 0.3
 UPDATE_RATE = 0.05
 
@@ -40,8 +40,8 @@ def pipe(a, b, r):
         m = xyz.rotate((1, 0, 0), radians(-90)).translate((x1, (y1 + y2) / 2.0, z1))
         return xyz.TransformedShape(c, m)
     if dz:
-        c = xyz.Cylinder(r, -dz / 2, dz / 2)
-        m = xyz.translate((x1, y1, (z1 + z2) / 2.0))
+        c = xyz.Cylinder(r, z1, z2)
+        m = xyz.translate((x1, y1, 0))
         return xyz.TransformedShape(c, m)
 
 class Pipe(object):
@@ -93,30 +93,46 @@ class Pipe(object):
                 self.add_sphere((x, y, z))
             self.direction = direction
             return True
+        # self.add_sphere(self.position)
+        # if len(self.occupied) < (SIZE * 2 + 1) ** 3:
+        #     self.restart()
+        #     return True
         return False
 
-def main():
-    random.seed(115)
+def create_drawing():
+    random.seed(1004)
     occupied = set()
     pipes = [Pipe(occupied) for _ in range(PIPES)]
-    for _ in range(600):
+    for _ in range(60000):
         done = True
         for pipe in pipes:
             if pipe.update():
                 done = False
         if done:
             break
+    print len(occupied)
     shapes = []
     for pipe in pipes:
         pipe.add_sphere(pipe.position)
         shapes.extend(pipe.shapes)
     print len(shapes)
     scene = xyz.Scene(shapes)
-    paths = scene.render((25, 25, 7), (0, 0, 0), (0, 0, 1), 60, 1, 0.1, 100, 0.05)
+    paths = scene.render((25, 25, 10), (0, 0, 0), (0, 0, 1), 60, 1, 0.1, 100, 0.05)
     # paths.append([(-1, -1), (1, -1), (1, 1), (-1, 1), (-1, -1)])
     drawing = xy.Drawing(paths).rotate(90).scale_to_fit(315, 380).rotate(-90)
+    return drawing
+
+def main():
+    try:
+        drawing = xy.Drawing.load('pipes.dwg')
+    except Exception:
+        drawing = create_drawing()
+    n = 50
+    o = 25
+    drawing = drawing.origin().crop(n, n + o, 315 - n, 315 - n + o).scale_to_fit(315, 315)
     # drawing = drawing.sort_paths_greedy().join_paths()
     drawing.render().write_to_png('pipes.png')
+    # drawing.save('pipes.dwg')
     # xy.draw(drawing)
 
 if __name__ == '__main__':

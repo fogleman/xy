@@ -1,5 +1,6 @@
 from matrix import Matrix
 import itertools
+from xy import progress
 import tree
 import util
 
@@ -19,9 +20,11 @@ class Scene(object):
         return self.tree.intersect(o, d, tmin, tmax)
 
     def clip_paths(self, eye, step):
+        print 'Clipping paths...'
+        bar = progress.Bar()
         paths = self.paths()
         result = []
-        for path in paths:
+        for path in bar(paths):
             result.extend(self.clip(path, eye, step))
         return result
 

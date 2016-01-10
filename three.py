@@ -1,4 +1,5 @@
 from math import radians
+import random
 import xy
 import xyz
 
@@ -30,21 +31,30 @@ def pipe(a, b, r):
         m = xyz.rotate((1, 0, 0), radians(-90)).translate((x1, (y1 + y2) / 2.0, z1))
         return xyz.TransformedShape(c, m)
     if dz:
-        c = xyz.Cylinder(r, -dz / 2, dz / 2)
-        m = xyz.translate((x1, y1, (z1 + z2) / 2.0))
+        c = xyz.Cylinder(r, z1, z2)
+        m = xyz.translate((x1, y1, 0))
         return xyz.TransformedShape(c, m)
 
 def main():
     shapes = []
-    shapes.append(sphere(0, 0, 0, 0.5))
-    shapes.append(pipe((0, 1, 2), (0, 3, 2), 0.25))
-    shapes.append(pipe((-3, -1, 5), (3, -1, 5), 0.25))
-    shapes.append(sphere(-3, -1, 5, 0.25))
-    shapes.append(sphere(3, -1, 5, 0.25))
-    shapes.append(sphere(0, 1, 2, 0.25))
-    shapes.append(sphere(0, 3, 2, 0.25))
+    for x in range(-4, 5):
+        for y in range(-4, 5):
+            z = random.random() * 2
+            r = random.random() + 0.5
+            shapes.append(xyz.Sphere(r, (x, y, z)))
+            # shapes.append(pipe((x, y, 0), (x, y, z), 0.25))
+            # shapes.append(sphere(x, y, z, 0.25))
+
+    # shapes.append(sphere(0, 0, 0, 0.5))
+    # shapes.append(pipe((0, 1, 2), (0, 3, 2), 0.25))
+    # shapes.append(pipe((-3, -1, 5), (3, -1, 5), 0.25))
+    # shapes.append(sphere(-3, -1, 5, 0.25))
+    # shapes.append(sphere(3, -1, 5, 0.25))
+    # shapes.append(sphere(0, 1, 2, 0.25))
+    # shapes.append(sphere(0, 3, 2, 0.25))
     # shapes.append(pipe((0, 0, 1), (0, 0, 4), 0.25))
     # shapes.append(pipe((0, 1, 0), (0, 1, 3), 0.25))
+
     # shapes.append(pipe((-1, 0, 0), (1, 0, 0), 0.5))
     # shapes.append(pipe((0, -1, 0), (0, 1, 0), 0.5))
     # shapes.append(pipe((0, 0, -1), (0, 0, 1), 0.5))
@@ -55,9 +65,9 @@ def main():
     # shapes.append(sphere(0, 1, 0, 0.5, 1))
     # shapes.append(sphere(0, 0, 1, 0.5, 2))
     scene = xyz.Scene(shapes)
-    paths = scene.render((20, 20, 30), (0, 0, 0), (0, 0, 1), 30, 1, 0.1, 100, 0.02)
-    paths.append([(-1, -1), (1, -1), (1, 1), (-1, 1), (-1, -1)])
-    drawing = xy.Drawing(paths).rotate(90).scale_to_fit(315, 380).rotate(-90)
+    paths = scene.render((20, 20, 10), (0, 0, 0), (0, 0, 1), 30, 1, 0.1, 100, 0.05)
+    # paths.append([(-1, -1), (1, -1), (1, 1), (-1, 1), (-1, -1)])
+    drawing = xy.Drawing(paths).scale_to_fit(315, 380)
     drawing = drawing.sort_paths_greedy().join_paths()
     drawing.render().write_to_png('three.png')
     # xy.draw(drawing)

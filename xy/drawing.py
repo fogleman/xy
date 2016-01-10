@@ -1,4 +1,5 @@
 from shapely import geometry, ops
+import cPickle as pickle
 import math
 import planner
 import util
@@ -26,6 +27,15 @@ class Drawing(object):
 
     def to_shapely(self):
         return geometry.MultiLineString(self.paths)
+
+    @staticmethod
+    def load(path):
+        with open(path, 'rb') as fp:
+            return Drawing(pickle.load(fp))
+
+    def save(self, path):
+        with open(path, 'wb') as fp:
+            pickle.dump(self.paths, fp, -1)
 
     @property
     def bounds(self):
