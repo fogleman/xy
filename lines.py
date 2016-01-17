@@ -47,6 +47,7 @@ def main():
         p4 = points[c]
         paths.extend(lines(p1, p2, p3, p4, 32))
     drawing = xy.Drawing(paths).scale_to_fit(315, 380)
+    drawing = drawing.sort_paths_greedy()
     drawing.render().write_to_png('lines.png')
 
 if __name__ == '__main__':
