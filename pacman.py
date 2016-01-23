@@ -1,4 +1,5 @@
 from PIL import Image
+import math
 import sys
 import xy
 
@@ -49,6 +50,14 @@ def find_bar(im):
         '.XXX',
         '.XXX',
         'XX..',
+    ]
+    return find_pattern(im, pattern)
+
+def find_ghosts(im):
+    pattern = [
+        'XXXXXX',
+        'XX.XXX',
+        'X...XX',
     ]
     return find_pattern(im, pattern)
 
@@ -216,12 +225,15 @@ def find_lines(im):
 
 def main():
     im = Image.open(sys.argv[1])
+
+    paths = []
+
+    # for x, y in get_points(im):
+    #     paths.extend(create_paths(x, -y))
+
+    # maze
     paths = []
     paths.extend(find_lines(im))
-    for x, y in find_dots(im):
-        paths.append(xy.circle(x + 1.5, -y - 1.5, 1))
-    for x, y in find_big_dots(im):
-        paths.append(xy.circle(x + 3.5, -y - 4.5, 4))
     for x, y in find_curve1(im):
         paths.append(xy.arc(x + 2, -y - 2, 2, 90, 180))
     for x, y in find_curve2(im):
@@ -251,8 +263,44 @@ def main():
         paths.append([(x + 1, -y - 2), (x + 18, -y - 2)])
         paths.append([(x + 1, -y - 0), (x + 1, -y - 3)])
         paths.append([(x + 18, -y - 0), (x + 18, -y - 3)])
+    maze_paths = xy.sort_paths_greedy(paths)
+
+    # ghosts
+    paths = []
+    for x, y in find_ghosts(im):
+        paths.append(xy.arc(x + 6.5, -y + 4.5, 6.5, 0, 180))
+        paths.append([(x, -y + 4.5), (x, -y - 2)])
+        paths.append([(x + 13, -y + 4.5), (x + 13, -y - 2)])
+        paths.append([(x, -y - 2), (x + 2, -y)])
+        paths.append([(x + 4, -y - 2), (x + 2, -y)])
+        paths.append([(x + 4, -y - 2), (x + 6.5, -y)])
+        paths.append([(x + 13, -y - 2), (x + 13 - 2, -y)])
+        paths.append([(x + 13 - 4, -y - 2), (x + 13 - 2, -y)])
+        paths.append([(x + 13 - 4, -y - 2), (x + 13 - 6.5, -y)])
+    ghost_paths = xy.sort_paths_greedy(paths)
+
+    # pacman
+    paths = []
+    x, y = 113, -189
+    paths.append(xy.arc(x, y, 6.5, 225, 135 + 360))
+    x1 = x + 6.5 * math.cos(math.radians(135))
+    y1 = y + 6.5 * math.sin(math.radians(135))
+    x2 = x + 6.5 * math.cos(math.radians(225))
+    y2 = y + 6.5 * math.sin(math.radians(225))
+    paths.append([(x1, y1), (x + 2, y)])
+    paths.append([(x2, y2), (x + 2, y)])
+    pacman_paths = xy.sort_paths_greedy(paths)
+
+    # dots
+    paths = []
+    for x, y in find_dots(im):
+        paths.append(xy.circle(x + 1.5, -y - 1.5, 1))
+    for x, y in find_big_dots(im):
+        paths.append(xy.circle(x + 3.5, -y - 4.5, 4))
+    dot_paths = xy.sort_paths_greedy(paths)
+
+    paths = maze_paths + ghost_paths + pacman_paths + dot_paths
     drawing = xy.Drawing(paths).scale_to_fit(315, 380)
-    drawing = drawing.sort_paths_greedy()
     drawing.render().write_to_png('pac.png')
 
 if __name__ == '__main__':
