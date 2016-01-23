@@ -4,7 +4,9 @@ import anneal
 import random
 
 def sort_paths_greedy(paths, reversable=True):
-    result = [paths.pop(0)]
+    first = max(paths, key=lambda x: x[0][1])
+    paths.remove(first)
+    result = [first]
     points = []
     for path in paths:
         x1, y1 = path[0]

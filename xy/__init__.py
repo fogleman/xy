@@ -10,4 +10,4 @@ from primitives import circle, arc
 
 from turtles import Turtle
 
-from util import draw, join_paths, parse_svg_path, simplify
+from util import draw, join_paths, parse_svg_path, remove_duplicates, simplify

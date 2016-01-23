@@ -70,6 +70,12 @@ class Drawing(object):
     def join_paths(self, tolerance=0.05):
         return Drawing(util.join_paths(self.paths, tolerance))
 
+    def remove_duplicates(self):
+        return Drawing(util.remove_duplicates(self.paths))
+
+    def simplify_paths(self, tolerance=0.05):
+        return Drawing(util.simplify_paths(self.paths, tolerance))
+
     def crop(self, x1, y1, x2, y2):
         box = geometry.Polygon([
             (x1, y1), (x2, y1), (x2, y2), (x1, y2), (x1, y1),

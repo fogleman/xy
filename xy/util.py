@@ -12,6 +12,9 @@ def simplify(points, tolerance=0.05):
     line = line.simplify(tolerance)
     return list(line.coords)
 
+def simplify_paths(paths, tolerance=0.05):
+    return [simplify(x, tolerance) for x in paths]
+
 def join_paths(paths, tolerance=0.05):
     if len(paths) < 2:
         return paths
@@ -24,6 +27,17 @@ def join_paths(paths, tolerance=0.05):
             result[-1].extend(path)
         else:
             result.append(list(path))
+    return result
+
+def remove_duplicates(paths):
+    result = []
+    seen = set()
+    for path in paths:
+        key = tuple((x, y) for x, y in path)
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(path)
     return result
 
 def draw(x, tolerance=0.05):
