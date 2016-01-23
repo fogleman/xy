@@ -263,7 +263,7 @@ def main():
         paths.append([(x + 1, -y - 2), (x + 18, -y - 2)])
         paths.append([(x + 1, -y - 0), (x + 1, -y - 3)])
         paths.append([(x + 18, -y - 0), (x + 18, -y - 3)])
-    maze_paths = xy.sort_paths_greedy(paths)
+    maze_paths = xy.join_paths(xy.sort_paths_greedy(paths))
 
     # ghosts
     paths = []
@@ -277,7 +277,7 @@ def main():
         paths.append([(x + 13, -y - 2), (x + 13 - 2, -y)])
         paths.append([(x + 13 - 4, -y - 2), (x + 13 - 2, -y)])
         paths.append([(x + 13 - 4, -y - 2), (x + 13 - 6.5, -y)])
-    ghost_paths = xy.sort_paths_greedy(paths)
+    ghost_paths = xy.join_paths(xy.sort_paths_greedy(paths))
 
     # pacman
     paths = []
@@ -289,7 +289,7 @@ def main():
     y2 = y + 6.5 * math.sin(math.radians(225))
     paths.append([(x1, y1), (x + 2, y)])
     paths.append([(x2, y2), (x + 2, y)])
-    pacman_paths = xy.sort_paths_greedy(paths)
+    pacman_paths = xy.join_paths(xy.sort_paths_greedy(paths))
 
     # dots
     paths = []
@@ -297,11 +297,12 @@ def main():
         paths.append(xy.circle(x + 1.5, -y - 1.5, 1))
     for x, y in find_big_dots(im):
         paths.append(xy.circle(x + 3.5, -y - 4.5, 4))
-    dot_paths = xy.sort_paths_greedy(paths)
+    dot_paths = xy.join_paths(xy.sort_paths_greedy(paths))
 
     paths = maze_paths + ghost_paths + pacman_paths + dot_paths
     drawing = xy.Drawing(paths).scale_to_fit(315, 380)
     drawing.render().write_to_png('pac.png')
+    xy.draw(drawing)
 
 if __name__ == '__main__':
     main()

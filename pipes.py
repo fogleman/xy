@@ -130,10 +130,10 @@ def main():
     n = 50
     o = 25
     drawing = drawing.origin().crop(n, n + o, 315 - n, 315 - n + o).scale_to_fit(315, 315)
-    # drawing = drawing.sort_paths_greedy().join_paths()
+    drawing = drawing.sort_paths_greedy().join_paths()
     drawing.render().write_to_png('pipes.png')
     # drawing.save('pipes.dwg')
-    # xy.draw(drawing)
+    xy.draw(drawing)
 
 if __name__ == '__main__':
     main()

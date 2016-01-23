@@ -14,8 +14,14 @@ def load_paths(filename):
 
 def main(filename):
     paths = load_paths(filename)
-    drawing = xy.Drawing(paths).scale_to_fit(315, 380)
-    drawing = drawing.move(315 / 2.0, 380 / 2.0, 0.5, 0.5)
+    paths = xy.remove_duplicates(paths)
+    drawing = xy.Drawing(paths).rotate_and_scale_to_fit(315, 380, step=90)
+    # drawing = drawing.move(315 / 2.0, 380 / 2.0, 0.5, 0.5)
+    drawing.paths = [x for x in drawing.paths if len(x) > 1]
+    # drawing = drawing.simplify_paths()
+    drawing = drawing.sort_paths_greedy()
+    drawing = drawing.join_paths()
+    # drawing = drawing.simplify_paths()
     im = drawing.render()
     im.write_to_png('paths.png')
     xy.draw(drawing)

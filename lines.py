@@ -49,6 +49,7 @@ def main():
     drawing = xy.Drawing(paths).scale_to_fit(315, 380)
     drawing = drawing.sort_paths_greedy()
     drawing.render().write_to_png('lines.png')
+    xy.draw(drawing)
 
 if __name__ == '__main__':
     main()
