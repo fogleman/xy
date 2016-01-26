@@ -7,6 +7,12 @@ import util
 def shapely_paths(shape):
     if hasattr(shape, 'coords'):
         return [list(shape.coords)]
+    elif hasattr(shape, 'exterior'):
+        paths = []
+        paths.append(list(shape.exterior.coords))
+        for interior in shape.interiors:
+            paths.append(list(interior.coords))
+        return paths
     elif hasattr(shape, 'geoms'):
         paths = []
         for child in shape.geoms:
