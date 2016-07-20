@@ -59,7 +59,7 @@ class Device(object):
         time.sleep(0.15)
         for point in points:
             self.move(*point)
-        self.pen(up)
+        self.pen(self.up if up is None else up)
         time.sleep(0.15)
 
     def gcode(self, g):
